@@ -32,6 +32,7 @@ async def communityNotepadFunction(ctx, a1, a2, *, msg):
         GeneralData.commit()       
         await ctx.reply(f"Anotado <:cat:1264072257433632789>")
 
+
 # Comando de mostrar
 @bot.command(name = "ShowNotePad", aliases = ["mostre", "mostra", "apresente-me"])
 async def showNotepad(ctx, *, a1):
@@ -40,21 +41,34 @@ async def showNotepad(ctx, *, a1):
             query = "SELECT message, author_ID FROM communityNotepad WHERE server_ID = ?"
             data = Cursor.execute(query, (ctx.guild.id,)).fetchall()
             if len(data) == 0:
+
                 await ctx.send(f"O {ctx.guild.name} tem uma incrível quantidade de 0 notas feitas")
+
             else:
+
+                result = []
                 for x in data:
                     author = await bot.fetch_user(x[1])
-                    await ctx.send(f"- \"{x[0]}\"\nAutor: {author}")
+                    result.append(f"- \"{x[0]}\"\nAutor: {author}")
+
+                await ctx.send("\n".join(result))
 
         case "minhas anotação"|"as minhas anotação"|"as minha anotação"|"as minhas anotações"|"minhas anotações"|"minhas nota"|"pra mim":
             query = "SELECT message FROM communityNotepad WHERE author_ID = ? AND server_ID = ?"
             data = Cursor.execute(query, (ctx.author.id, ctx.guild.id)).fetchall()
 
             if len(data) == 0:
+
                 await ctx.reply("Tu n tem nota feita :thumbsup:")
+
             else:
+
+                result = []
+
                 for i, x in enumerate(data):
-                    await ctx.send(f"{i} - \"{x[0]}\"")
+                    result.append(f"{i} - \"{x[0]}\"")
+                await ctx.send("\n".join(result))
+
 
 # Comando de deletar nota
 @bot.command(name = "deleteNotePad", aliases = ["deleta", "apague", "acabe-lhe", "descombule-se", "evaporize-se", "mate", "mata"])
@@ -84,8 +98,6 @@ async def deleteNote(ctx, *, i):
         else:
             await ctx.send("O burro tu tem q especificar os numero (baseado na sua lista de notas)")
 
-
-
 # Otras merda
 
 @bot.command(name = "test")
@@ -102,6 +114,7 @@ async def pongbop(ctx, *, confirm):
     if confirm in ["mata", "se fude", "si fude", "sifude", "se foder", "sifuder", "si fuder", "pro caralho", "pra merda", "catar coquinho"]:
         await ctx.reply("<:spong_bop:1264260742975197264>")
 
+
 # Comando de Ajuda
 @bot.command(name = "ayuda")
 async def test(ctx):
@@ -109,21 +122,23 @@ async def test(ctx):
     await ctx.author.send("Pra uma listinha bem basica de comandos que eu tenho é o seguinte, nós temos:\n- ayuda = Faz eu manda os comandos\n- autista = <:trol:968658017086242897>\n- diz [frase] = ele diz uai")
     await ctx.author.send("Agora o bagui de notas lá:\n- anota pra mim [nota] = faz uma anotação\n- mostra as nota = mostra as nota de todo mundo do server\n- mostra minhas nota = mostra as suas notas no servidor (com numeração)\n- mata [numero] = deleta uma nota baseada no numero dela (refira-se ao ultimo comando)")
 
+
+
 @bot.command(name = "autista")
 async def sendImage(ctx):
     file = nextcord.File("Images/autismo.jpg", filename="autismo.png")
     await ctx.send(file=file)
     await ctx.message.delete()
 
+
+
 @bot.command(name = "selecionarCanal", aliases = ["selecionarcanal", "channelselect", "channelSelect", "canallembrar", "LEMBRA"])
 async def channelStore(ctx):
-
     server_id = ctx.guild.id
     query1 = "SELECT channel FROM storedLocations WHERE server = ?"
     currentChannelStored = Cursor.execute(query1, (server_id,)).fetchone()
     channel_id = ctx.channel.id
     
-
     if currentChannelStored == ctx.channel.id:
 
         await ctx.reply("O seu burro você ja ta no canal escolhido")
@@ -142,8 +157,8 @@ async def channelStore(ctx):
         GeneralData.commit()
         await ctx.send("Tá to lembrano")        
 
-       
-   
+
+
 @bot.command(name = "diz")
 async def sendMessage(ctx, *, message):
     await ctx.send(message)
