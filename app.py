@@ -1,6 +1,8 @@
 import nextcord
 import sqlite3
 import os
+import yt_dlp
+import asyncio
 
 from nextcord import Intents
 from nextcord.ext import commands
@@ -13,6 +15,48 @@ GeneralData = sqlite3.connect('GeneralBotData.db')
 Cursor = GeneralData.cursor()
 GeneralData.execute("CREATE TABLE IF NOT EXISTS storedLocations(channel INT, server INT)")
 GeneralData.execute("CREATE TABLE IF NOT EXISTS communityNotepad(message STR, author_ID INT, server_ID INT)")
+
+ytdl_format_options = {
+    'format': 'best',
+    'estrictfilenames': True,
+    'noplaylist': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': False,
+    'logtostderr': False,
+    'quiet': True,
+    'no_warnings': True,
+    'default_search': 'auto',
+    'source_address': '0.0.0.0'
+}
+
+ffmpeg_format_options = {
+    'options': '-vn'
+}
+
+musicQueue = []
+
+ytdl = yt_dlp.YoutubeDL(ytdl_format_options)
+
+class YTDLSource(nextcord.PCMVolumeTransformer):
+    def __init__(self, source, *, data, volume=0.5):
+        super().__init__(source, volume)
+
+        self.data = data
+
+        self.title = data.get('title')
+        self.url = ""
+
+    @classmethod
+    async def from_url(cls, url, *, loop=None, stream=True):
+        loop = loop or asyncio.get_event_loop()
+        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+
+        if 'entries' in data:
+            data = data['entries'][0]
+
+        filename = data['url'] if stream else ytdl.prepare_filename(data)
+        return cls(nextcord.FFmpegPCMAudio(filename, **ffmpeg_format_options), data=data)
+
 
 async def getEmojis():
     main_server = await bot.fetch_guild(1263933229367562251)
@@ -68,6 +112,9 @@ async def showNotepad(ctx, *, a1):
                 for i, x in enumerate(data):
                     result.append(f"{i} - \"{x[0]}\"")
                 await ctx.send("\n".join(result))
+        
+        case "as musica"|"a lista de musicas"|"as musicas":
+            ctx.reply("\n".join(musicQueue))
 
 
 # Comando de deletar nota
@@ -98,6 +145,82 @@ async def deleteNote(ctx, *, i):
         else:
             await ctx.send("O burro tu tem q especificar os numero (baseado na sua lista de notas)")
 
+# YOUTUBE HELL YEAHHH
+
+@bot.command("joinCall", aliases = ["entra"])
+async def joinCall(ctx, a1):
+    if a1 in ["ai", "ae"]:
+        if hasattr(ctx.author.voice, 'channel'):
+            await ctx.reply("ok <:cat:1264072257433632789>")
+            await ctx.author.voice.channel.connect()
+        else:
+            await ctx.reply("Tenta entrar na call primeiro")
+
+
+
+@bot.command("leaveCall", aliases = ["vaza", "sai"])
+async def leaveCall(ctx):
+    currentCall = ctx.voice_client
+    if currentCall:
+        await currentCall.disconnect()
+        await ctx.reply("ok <:cat:1264072257433632789>")
+    else:
+        await ctx.reply("eu nem to em call uai")
+
+
+
+@bot.command("play", aliases = ["toca"])
+async def requestHandler(ctx, *, url):
+    VCClient = ctx.voice_client
+    if VCClient:
+        await ctx.send("ok calma")
+
+        isNew = not VCClient.is_playing() and len(musicQueue) == 0 
+
+        if isNew:
+            musicQueue.append(["PLACEHOLDER", "PLACEHOLDER"])
+                               
+        musicQueue.append([url, "PLACEHOLDER"])
+            
+        if isNew:
+            bot.loop.create_task(playSong(ctx, VCClient)) 
+        else:
+            await ctx.reply(f"botado na playlist")
+
+async def playSong(ctx, VC):
+    del(musicQueue[0])
+    if len(musicQueue) > 0:
+        try:          
+            async with ctx.typing():
+                next_song = musicQueue[0][0]
+                player = await YTDLSource.from_url(next_song, loop=bot.loop)
+                await ctx.send(f"Tocano: **{player.title}**")
+                musicQueue[0][1] = player.title
+                VC.play(player, after=lambda e: bot.loop.create_task(playSong(ctx, VC)))
+        except yt_dlp.utils.DownloadError as e:
+                await ctx.send("deu ruim, proxima música")
+                bot.loop.create_task(playSong(ctx, VC))
+    else:
+        await ctx.send("Cabô a fila")
+
+
+@bot.command("skip", aliases = ["skipa", "pula"])
+async def skip(ctx):
+    VC = ctx.voice_client
+    if VC:
+        VC.stop()
+        await ctx.reply("tá")
+
+
+@bot.command("playing", aliases = ["diz", "fala"])
+async def playing(ctx, *, msg):
+    if msg in ["oq tá tocando", "oq tá tocando", "oq tá tocano", "oq ta tocano", "a musica que esta sendo reproduzida nesse momento"]:  
+        if musicQueue:
+            currentSongTitle = musicQueue[0][1]
+            await ctx.reply(f"**{currentSongTitle}**")
+        else:
+            await ctx.reply("nada")
+
 # Otras merda
 
 @bot.command(name = "test")
@@ -109,9 +232,9 @@ async def test(ctx):
 
 # Comando de ser xingado ai que triste
 
-@bot.command(name = "KILLYOURSELF", aliases = ["se", "vai"])
+@bot.command(name = "KILLYOURSELF", aliases = ["si", "se", "vai"])
 async def pongbop(ctx, *, confirm):
-    if confirm in ["mata", "se fude", "si fude", "sifude", "se foder", "sifuder", "si fuder", "pro caralho", "pra merda", "catar coquinho"]:
+    if confirm in ["mata", "mata mlk", "se fude", "si fude", "sifude", "se foder", "sifuder", "si fuder", "pro caralho", "pra merda", "catar coquinho"]:
         await ctx.reply("<:spong_bop:1264260742975197264>")
 
 
@@ -159,7 +282,7 @@ async def channelStore(ctx):
 
 
 
-@bot.command(name = "diz")
+@bot.command(name = "repeatAfterMe", aliases = ["repita"])
 async def sendMessage(ctx, *, message):
     await ctx.send(message)
     await ctx.message.delete()
