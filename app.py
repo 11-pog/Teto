@@ -13,7 +13,7 @@ bot = commands.Bot(command_prefix=['aproveita e ', 'Aproveita e '], intents=inte
 
 GeneralData = sqlite3.connect('GeneralBotData.db')
 Cursor = GeneralData.cursor()
-GeneralData.execute("CREATE TABLE IF NOT EXISTS storedLocations(channel INT, server INT)")
+GeneralData.execute("CREATE TABLE IF NOT EXISTS storedLocations(channel INT, server INT, general_ID)")
 GeneralData.execute("CREATE TABLE IF NOT EXISTS communityNotepad(message STR, author_ID INT, server_ID INT)")
 
 ytdl_format_options = {
@@ -195,8 +195,6 @@ async def requestHandler(ctx, *, url):
 
 async def playSong(ctx, VC):
     del(musicQueue[0])
-    while VC.is_playing():
-        await asyncio.sleep(1)
     if len(musicQueue) > 0:
         try:          
             async with ctx.typing():
@@ -230,9 +228,10 @@ async def playing(ctx, *, msg):
             await ctx.reply("nada")
 
 @bot.event
-async def on_disconnect():
-    global musicQueue
-    musicQueue = []
+async def on_voice_state_update(member, before, after):
+    if member == bot.user and before.channel and not after.channel:
+        global musicQueue
+        musicQueue = ["placeholder"]
 
 # Otras merda
 
@@ -245,7 +244,7 @@ async def test(ctx):
 
 # Comando de ser xingado ai que triste
 
-@bot.command(name = "KILLYOURSELF", aliases = ["si", "se", "vai"])
+@bot.command(name = "xingamento", aliases = ["si", "se", "vai"])
 async def pongbop(ctx, *, confirm):
     if confirm in ["mata", "mata mlk", "se fude", "si fude", "sifude", "se foder", "sifuder", "si fuder", "pro caralho", "pra merda", "catar coquinho"]:
         await ctx.reply("<:spong_bop:1264260742975197264>")
@@ -268,30 +267,75 @@ async def sendImage(ctx):
 
 
 
+commandMap = {
+    "O BOA TARDE": 0,
+    "O CANAL DE MUSICA": 1
+    # for now thats it
+}
+
+
+
 @bot.command(name = "selecionarCanal", aliases = ["selecionarcanal", "channelselect", "channelSelect", "canallembrar", "LEMBRA"])
-async def channelStore(ctx):
+async def channelStore(ctx, *, msg):
+    index = commandMap.get(msg, None)
     server_id = ctx.guild.id
-    query1 = "SELECT channel FROM storedLocations WHERE server = ?"
-    currentChannelStored = Cursor.execute(query1, (server_id,)).fetchone()
     channel_id = ctx.channel.id
-    
-    if currentChannelStored == ctx.channel.id:
 
-        await ctx.reply("O seu burro você ja ta no canal escolhido")
+    if index is not None:
+        query1 = "SELECT channel FROM storedLocations WHERE server = ? AND general_ID = ?"
+        data = Cursor.execute(query1, (server_id, index)).fetchone()
 
-    elif currentChannelStored:
-        
-        query = "UPDATE storedLocations SET channel = ? WHERE server = ?"
-        Cursor.execute(query, (channel_id, server_id))
-        GeneralData.commit()
-        await ctx.send("Tá to relembrano")
+        if data:
+            currentChannelStored, = data
 
-    else:
+            if currentChannelStored == channel_id:
 
-        query = "INSERT INTO storedLocations VALUES (?, ?)"
-        Cursor.execute(query, (channel_id, server_id))
-        GeneralData.commit()
-        await ctx.send("Tá to lembrano")        
+                await ctx.reply("O seu burro você ja ta no canal escolhido")
+
+            else:                
+                query = "UPDATE storedLocations SET channel = ? WHERE server = ?"
+                Cursor.execute(query, (channel_id, server_id))
+                GeneralData.commit()
+                await ctx.send("Tá to relembrano")
+
+        else:
+
+            query = "INSERT INTO storedLocations VALUES (?, ?, ?)"
+            Cursor.execute(query, (channel_id, server_id, index))
+            GeneralData.commit()
+            await ctx.send("Tá to lembrano")
+
+
+
+@bot.command(name = "esquecerCanal", aliases = ["esquecercanal", "ESQUECE", "ESQUEÇE"])
+async def channelForget(ctx, *, msg):
+    index = commandMap.get(msg, None)
+    if index is not None:
+        channel_id = ctx.channel.id
+        server_id = ctx.guild.id
+        query = "SELECT channel FROM storedLocations WHERE server = ? AND general_ID = ?"
+        data = Cursor.execute(query, (server_id, index)).fetchone()
+
+        if data:
+            chnl = await bot.fetch_channel(*data)
+            confirmMSG = await ctx.send(f"certeza que quer deletar isso do canal {chnl.name}")
+            await confirmMSG.add_reaction("<:cat:1264072257433632789>")
+
+            def checkForReaction(reaction, author):
+                return author == ctx.author and str(reaction.emoji) == "<:cat:1264072257433632789>"
+            
+            try:
+                reaction, user = await bot.wait_for("reaction_add", timeout=5.0, check=checkForReaction)
+
+                query2 = "DELETE FROM storedLocations WHERE channel = ? AND server = ? AND general_ID = ?"
+                Cursor.execute(query2, (channel_id, server_id, index))
+                GeneralData.commit()
+                await ctx.send("Tá to esquecendo")
+            except asyncio.TimeoutError:
+                await ctx.send("Esqueci oq eu ia fazer fr")
+
+        else:
+            await ctx.reply("meu mano não tem canal selecionado pra isso aqui nesse server")
 
 
 
@@ -306,7 +350,7 @@ async def sendMessage(ctx, *, message):
 async def on_ready():
     print(f"Logged in as: {bot.user.name}")
 
-    query = "SELECT * FROM storedLocations"
+    query = "SELECT channel, server FROM storedLocations WHERE general_ID = 0"
     data = Cursor.execute(query).fetchall()
 
     for x in data:
@@ -318,6 +362,7 @@ async def on_ready():
             print(f"Mensage mandada em: {currentServer.name}")
         else:
             print(f"O servidor {currentServer.name} não possue nenhum canal marcado")
+
     
 
 
