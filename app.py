@@ -57,7 +57,7 @@ class YTDLSource(nextcord.PCMVolumeTransformer):
     @classmethod
     async def from_url(cls, url, shuffle = False, *, loop=None):
         loop = loop or asyncio.get_event_loop()
-        info = await cls.get_info(url, True, shuffle, loop=loop)
+        info, _ = await cls.get_info(url, True, shuffle, loop=loop)
 
         data = await asyncio.wait_for(loop.run_in_executor(None, lambda: ytdl.extract_info(info['url'] if 'url' in info else info['original_url'], download=False)), timeout=30)
 
@@ -68,6 +68,7 @@ class YTDLSource(nextcord.PCMVolumeTransformer):
     async def get_info(cls, url, addToQueue = False, shuffle = False, *, loop=None):
         loop = loop or asyncio.get_event_loop()
         info = await asyncio.wait_for(loop.run_in_executor(None, lambda: ytdlInfoExtractor.extract_info(url, download=False)), timeout=15)
+        addedToQueue = False
 
         if 'entries' in info and info['entries']:
             if shuffle:
@@ -75,9 +76,10 @@ class YTDLSource(nextcord.PCMVolumeTransformer):
             if addToQueue:
                 for entry in info['entries'][1:]:
                     musicQueue.append([entry['url'], entry['title']])
+                addedToQueue = True
             info = info['entries'][0]        
              
-        return info
+        return info, addedToQueue
 
 
 
@@ -146,6 +148,7 @@ async def showNotepad(ctx, *, a1):
                         message = songMessage
                     else:
                         message += songMessage
+                ctx.send(message)
             elif currentlyPlaying is not None:
                 await ctx.send(f"- **{currentlyPlaying}**")
             else:
@@ -222,12 +225,15 @@ async def requestHandler(ctx, *, url):
         await ctx.send("ok calma")
 
         isNew = not VCClient.is_playing() and len(musicQueue) == 0 
+        wasAdded = False
+
         try:
-            info = await YTDLSource.get_info(data[0], False, loop=bot.loop)
+            info, wasAdded = await YTDLSource.get_info(data[0], not isNew, shuffle, loop=bot.loop)
         except asyncio.TimeoutError:
             info = {'title': 'PlaceHolder'}
 
-        musicQueue.append([data[0], info['title']])
+        if not wasAdded:
+            musicQueue.append([data[0], info['title']])
             
         if isNew:
             bot.loop.create_task(playSong(ctx, VCClient, shuffle)) 
@@ -427,6 +433,8 @@ async def toDelete(ctx):
             except:
                 pass
         await asyncio.gather(*[msg.delete() for msg in finalMsgsToDel])
+        del markedMessages[channelID]
+        await ctx.author.send("Pronto")
 
 
 @bot.event
