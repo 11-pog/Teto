@@ -441,7 +441,13 @@ async def toDelete(ctx):
 async def on_message(message):
     if message.channel.id in markedMessages:
         markedMessages[message.channel.id].append(message)
+
+    if str.lower(message.content) == 'fat fuck' and message.author.id != bot.user.id:
+        await message.channel.send('fat fuck') 
+    
     await bot.process_commands(message)
+
+
 # OTRAS COISA AINDA
 
 @bot.event
