@@ -476,6 +476,8 @@ async def on_ready():
 
     await asyncio.sleep(random.randint(40, 90))
 
+    print('it starts')
+
     scheduler.add_job(theTrolling_Handler, 'interval', seconds = 45)
     scheduler.start()
 
