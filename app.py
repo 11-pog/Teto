@@ -495,32 +495,47 @@ Audios = [
 
 
 async def theTrolling_Handler():
-    if random.randint(1, 50) <= 8:
+    zap2 = await getServerByName('Whatsapp 2')
 
-        print('time to perform some tomfoolery')
+    if not any(VcClients.guild.id == zap2.id for VcClients in bot.voice_clients):
+        if random.randint(1, 50) <= 8:
 
-        if random.randint(1, 10) <= 3:
-            await performAMinusculeAmountOfDespicableActions()
+            print('time to perform some tomfoolery')
+
+            if random.randint(1, 10) <= 3:
+                await performAMinusculeAmountOfDespicableActions()
+            else:
+                await theFakeout()
+
         else:
-            await theFakeout()
 
+            print('nah')
+    
     else:
-
-        print('nah')
-
+        print('unfortunately it is already here')
 
 
-async def getPopulatedVc():
+
+async def getServerByName(serverName):
     servers = bot.guilds
     zap2 = None
 
-    print('getting the populated vcs')
+    print('adquiring the server')
 
     for index in servers:
-        if index.name == "Whatsapp 2":
+        if index.name == serverName:
             zap2 = index
+            return zap2
+    
+    return None
+
+
+async def getPopulatedVc():
+    zap2 = await getServerByName('Whatsapp 2')
 
     VCs = zap2.voice_channels
+
+    print('adquiring populated Vcs')
 
     return [vc for vc in VCs if len(vc.voice_states) > 0]
 
