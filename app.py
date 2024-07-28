@@ -15,6 +15,8 @@ bot = commands.Bot(command_prefix=['aproveita e ', 'Aproveita e '], intents=inte
 
 scheduler = AsyncIOScheduler()
 
+schedulerJobDict = {}
+
 GeneralData = sqlite3.connect('GeneralBotData.db')
 Cursor = GeneralData.cursor()
 GeneralData.execute("CREATE TABLE IF NOT EXISTS storedLocations(channel INT, server INT, general_ID)")
@@ -478,7 +480,7 @@ async def on_ready():
 
     print('it starts')
 
-    scheduler.add_job(theTrolling_Handler, 'interval', seconds = 45)
+    schedulerJobDict['theTrollingJob'] = scheduler.add_job(theTrolling_Handler, 'interval', seconds = 45)
     scheduler.start()
 
 
@@ -548,15 +550,19 @@ async def theFakeout():
     Vc = await getPopulatedVc()
 
     if len(Vc):
+        await scheduler.pause_job(schedulerJobDict["theTrollingJob"].id)
+
         Call = random.choice(Vc)
 
         VcClient = await Call.connect()
 
-        await asyncio.sleep(random.randint(10, 90))
+        await asyncio.sleep(random.randint(10, 40))
 
         await VcClient.disconnect()
 
         print('fakeout endended')
+
+        await scheduler.resume_job(schedulerJobDict["theTrollingJob"].id)
 
     else:
 
@@ -572,6 +578,8 @@ async def performAMinusculeAmountOfDespicableActions():
     Vc = await getPopulatedVc()
 
     if len(Vc) > 0:
+        await scheduler.pause_job(schedulerJobDict["theTrollingJob"].id)
+
         selectedCall = random.choice(Vc)
         await selectedCall.connect()
 
@@ -579,12 +587,14 @@ async def performAMinusculeAmountOfDespicableActions():
         source = nextcord.FFmpegPCMAudio(f"Audios/{selectedAudio}")
         botVCClient = bot.voice_clients[0]
 
-        await asyncio.sleep(random.uniform(4, 18))
+        await asyncio.sleep(random.randint(4, 33))
 
         async def stop():
             await asyncio.sleep(random.uniform(0.2, 2))  
             await botVCClient.disconnect()  
             print('enderd the little trolling')
+
+            await scheduler.resume_job(schedulerJobDict["theTrollingJob"].id)
 
         botVCClient.play(source, after = lambda e: stop())
 
