@@ -503,7 +503,7 @@ async def on_ready():
 
             botVCClient.play(source)
 
-            await asyncio.sleep(random.uniform(1, 28))  
+            await asyncio.sleep(random.uniform(0.2, 2))  
 
             await botVCClient.disconnect()     
     
