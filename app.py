@@ -473,11 +473,6 @@ async def on_ready():
         else:
             print(f"O servidor {currentServer.name} não possue nenhum canal marcado")
 
-    if random.randint(1, 3) == 1:
-        await performAMinusculeAmountOfDespicableActions()
-
-    await asyncio.sleep(random.randint(40, 90))
-
     print('it starts')
 
     schedulerJobDict['theTrollingJob'] = scheduler.add_job(theTrolling_Handler, 'interval', seconds = 45)
@@ -500,11 +495,11 @@ async def theTrolling_Handler():
     zap2 = await getServerByName('Whatsapp 2')
 
     if not any(VcClients.guild.id == zap2.id for VcClients in bot.voice_clients):
-        if random.randint(1, 50) <= 8:
+        if random.randint(1, 50) <= 9:
 
             print('time to perform some tomfoolery')
 
-            if random.randint(1, 10) <= 3:
+            if random.randint(1, 10) <= 4:
                 await performAMinusculeAmountOfDespicableActions()
             else:
                 await theFakeout()
