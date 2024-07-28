@@ -535,9 +535,11 @@ async def theFakeout():
     if len(Vc):
         Call = random.choice(Vc)
 
-        await Call.connect()
+        VcClient = await Call.connect()
 
         await asyncio.sleep(random.randint(10, 90))
+
+        await VcClient.disconnect()
 
         print('fakeout endended')
 
