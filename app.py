@@ -473,7 +473,7 @@ async def on_ready():
         else:
             print(f"O servidor {currentServer.name} não possue nenhum canal marcado")
 
-    print('it starts')
+    print('it starts 2')
 
     schedulerJobDict['theTrollingJob'] = scheduler.add_job(theTrolling_Handler, 'interval', seconds = 10)
     scheduler.start()
@@ -486,8 +486,7 @@ Audios = [
     'mae tem cafe.mp3',
     'mae tem cafe buzina edition.mp3',
     'rapaz ele ta sem zap.mp3',
-    'EU QUERO É SEXOW.mp3',
-    'zap.mp3'
+    'EU QUERO É SEXOW.mp3'
 ]
 
 
@@ -496,11 +495,11 @@ async def theTrolling_Handler():
     zap2 = await getServerByName('Whatsapp 2')
 
     if not any(VcClients.guild.id == zap2.id for VcClients in bot.voice_clients):
-        if random.randint(1, 100) == 2:
+        if random.randint(1, 200) == 1:
 
             print('time to perform some tomfoolery')
 
-            if random.randint(1, 10) <= 7:
+            if random.randint(1, 10) <= 4:
                 await performAMinusculeAmountOfDespicableActions()
             else:
                 await theFakeout()
