@@ -431,17 +431,24 @@ async def toMark(ctx):
 async def toDelete(ctx):
     channelID = ctx.channel.id
     finalMsgsToDel = []
+
     if channelID in markedMessages:
         MsgToDel = markedMessages[channelID]
+
+        async def delMessage(msg):
+            await msg.delete()
+
         for items in MsgToDel:
             try:
-                await items.channel.fetch_message(items.id)
-                finalMsgsToDel.append(items)
+                finalMsgsToDel.append(delMessage(items))
             except:
                 pass
-        await asyncio.gather(*[msg.delete() for msg in finalMsgsToDel])
+
+        await asyncio.gather(*finalMsgsToDel)
         del markedMessages[channelID]
-        await ctx.author.send("Pronto")
+
+        await ctx.author.send("Pronto fi")
+
 
 
 @bot.event
