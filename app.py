@@ -8,7 +8,7 @@ import random
 from nextcord import Intents
 from nextcord.ext import commands
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
- 
+
 intents = Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix=['aproveita e ', 'Aproveita e '], intents=intents)
@@ -83,7 +83,7 @@ class YTDLSource(nextcord.PCMVolumeTransformer):
                     musicQueue.append([entry['url'], entry['title']])
                 addedToQueue = True
             info = info['entries'][0]        
-             
+            
         return info, addedToQueue
 
 
@@ -97,14 +97,17 @@ async def getEmojis():
 # Sistema de bloco de notas comunitario
 # Comando de anotar
 @bot.command(name = "notePadWrite", aliases = ["anota"])
-async def communityNotepadFunction(ctx, a1, a2, *, msg):
+async def communityNotepadFunction(ctx, a1, a2, *, msg = None):
     if a1 == "pra" and a2 == "mim":
-        authorID = ctx.author.id
-        serverID = ctx.guild.id
-        query = "INSERT INTO communityNotepad VALUES (?, ?, ?)"
-        Cursor.execute(query, (msg, authorID, serverID))
-        GeneralData.commit()       
-        await ctx.reply(f"Anotado <:cat:1264072257433632789>")
+        if msg is not None:
+            authorID = ctx.author.id
+            serverID = ctx.guild.id
+            query = "INSERT INTO communityNotepad VALUES (?, ?, ?)"
+            Cursor.execute(query, (msg, authorID, serverID))
+            GeneralData.commit()       
+            await ctx.reply(f"Anotado <:cat:1264072257433632789>")
+        else:
+            await ctx.reply("Anotar o que porra")
 
 
 # Comando geral de mostrar
@@ -502,7 +505,7 @@ async def theTrolling_Handler():
     zap2 = await getServerByName('Whatsapp 2')
 
     if not any(VcClients.guild.id == zap2.id for VcClients in bot.voice_clients):
-        if random.randint(1, 200) == 1:
+        if random.randint(1, 120) == 1:
 
             print('time to perform some tomfoolery')
 
