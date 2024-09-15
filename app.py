@@ -501,18 +501,7 @@ async def on_ready():
     schedulerJobDict['theTrollingJob'] = scheduler.add_job(theTrolling_Handler, 'interval', seconds = 10)
     scheduler.start()
 
-
-
-Audios = [
-    'A bobina.mp3',
-    'Aii meu piruuu.mp3',
-    'mae tem cafe.mp3',
-    'mae tem cafe buzina edition.mp3',
-    'rapaz ele ta sem zap.mp3',
-    'EU QUERO É SEXOW.mp3'
-]
-
-
+Audios = os.listdir('./Audios')
 
 async def theTrolling_Handler():
     zap2 = await getServerByName('Whatsapp 2')
@@ -556,7 +545,6 @@ async def getMemberByName(name):
                 return member
     
     return None
-
 
 
 async def getMemberById(ID):
