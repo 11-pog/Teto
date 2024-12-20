@@ -4,7 +4,7 @@ import os
 import yt_dlp
 import asyncio
 import random
-import keyboard
+# import keyboard
 
 from nextcord import Intents
 from nextcord.ext import commands
