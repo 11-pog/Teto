@@ -527,7 +527,6 @@ async def theTrolling_Handler():
         print('unfortunately it is already here')
 
 
-
 async def getServerByName(serverName):
     servers = bot.guilds
     zap2 = None
@@ -540,7 +539,6 @@ async def getServerByName(serverName):
             return zap2
     
     return None
-
 
 
 async def getMemberByName(name):
@@ -603,7 +601,8 @@ async def performAMinusculeAmountOfDespicableActions():
 
     vc_bot_client.play(source, after = stop)
 
-
+'''
+# Old code that synced my "mic" account's mute with my main account's mute, from the time i didnt have a mic yet.
 async def on_key_event(e):
     print(f"TESTESTESTES: {e}")
     
@@ -617,6 +616,7 @@ def await_the_thing(e):
     asyncio.run_coroutine_threadsafe(on_key_event(e), bot.loop)
 
 keyboard.on_press_key("decimal", callback = await_the_thing)
+'''
 
 if __name__ == '__main__':
     bot.run(os.environ['DISCORD_TOKEN'])
