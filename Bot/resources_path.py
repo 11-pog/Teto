@@ -1,8 +1,13 @@
+import os
+
 class ResourcesPath:
     def __init__(self):
-        self.path_to_audios = "./Bot/Resources/Audios"
-        self.path_to_images = "./Bot/Resources/Images"
-        self.path_to_databases = "./Bot/Resources/DataBase"
+        self.base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        
+        self.path_to_audios = os.path.join(self.base_path, "Bot", "Resources", "Audios")
+        self.path_to_images = os.path.join(self.base_path, "Bot", "Resources", "Images")
+        self.path_to_databases = os.path.join(self.base_path, "Bot", "Resources", "DataBase")
+
         
     def __call__(self, type):
         match type.lower():
