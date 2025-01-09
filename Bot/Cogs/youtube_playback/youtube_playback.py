@@ -6,78 +6,8 @@ from nextcord.ext import commands
 
 import yt_dlp
 
-
-class YTDLConfig:
-    """Configuration class for YTDLSource
-    """
-    def __init__(self):
-        self.ytdl_format_options = {
-            'format': 'bestaudio/best',
-            'restrictfilenames': True,
-            'noplaylist': True,
-            'nocheckcertificate': True,
-            'ignoreerrors': False,
-            'logtostderr': False,
-            'quiet': True,
-            'no_warnings': True,
-            'default_search': 'auto',
-            'source_address': '0.0.0.0',
-            'fragment_retries': 5,
-            'extract_flat': True
-        }
-
-        self.ytdl_extractor_options = {
-            'extract_flat': True,
-            'quiet': True,
-            'noplaylist': False
-        }
-
-        self.ffmpeg_format_options = {
-            'options': '-vn',
-            "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
-        }
-
-        self.yt_downloader = yt_dlp.YoutubeDL(self.ytdl_format_options)
-        self.yt_info_extractor = yt_dlp.YoutubeDL(self.ytdl_extractor_options)
-
-
-class YTDLSource(nextcord.PCMVolumeTransformer):
-    def __init__(self, source, *, data, volume=0.5):
-        super().__init__(source, volume)
-
-        self.data = data
-
-        self.title = data.get('title')
-        self.url = ""
-
-    @classmethod
-    async def stream_from_url(cls, url, *, timeout = 30, config: YTDLConfig, loop=None):
-        loop = loop or asyncio.get_event_loop()
-
-        data = await asyncio.wait_for(loop.run_in_executor(None, lambda: config.yt_downloader.extract_info(url, download=False)), timeout=timeout)
-
-        filename = data['url']
-        return cls(nextcord.FFmpegPCMAudio(filename, **config.ffmpeg_format_options), data=data)
-        
-    @classmethod
-    async def get_info_from_url(cls, url, *, timeout = 15, config: YTDLConfig, loop=None):
-        loop = loop or asyncio.get_event_loop()
-        info = await asyncio.wait_for(loop.run_in_executor(None, lambda: config.yt_info_extractor.extract_info(url, download=False)), timeout=timeout)
-
-        return info
-
-
-"""
-if 'entries' in info and info['entries']:
-    if shuffle:
-        random.shuffle(info['entries'])
-    if addToQueue:
-        for entry in info['entries'][1:]:
-            music_queue.append([entry['url'], entry['title']])
-        addedToQueue = True
-    info = info['entries'][0]  
-"""
-
+from Cogs.youtube_playback.YTDLConfig import YTDLConfig
+from Cogs.youtube_playback.YTDLSource import YTDLSource
 
 class youtube_playback(commands.Cog):
     def __init__(self, bot: commands.Bot):

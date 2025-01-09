@@ -30,7 +30,7 @@ database = DatabaseManager()
 i_am_afraid = Mischief(bot,
     servers_with_tomfoolery_present= [
         "Whatsapp 2",
-        "Teste de BOT",
+        "Bot Testing Ground",
         "VILA DO CHAVES"
         ],
     playable_audio_list_path= os.listdir(resources('audio')),
