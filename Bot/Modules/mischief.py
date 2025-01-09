@@ -34,36 +34,32 @@ class Mischief:
 
 
     async def mischief_interface(self):
-        zap2 = await self.info_manager.fetch_guild_by_name('Whatsapp 2')
-
-        if not any(VcClients.guild.id == zap2.id for VcClients in self.bot.voice_clients):
-            if random.randint(1, self.chance_denominator) == 1:
-                print('time to perform some tomfoolery')
-                
-                await self.performAMinusculeAmountOfDespicableActions()
-            else:
-                print('nah')
-        
+        if random.randint(1, self.chance_denominator) == 1:
+            print('time to perform some tomfoolery')
+            
+            await self.perform_a_minuscule_amount_of_despicable_actions()
         else:
-            print('unfortunately it is already here')
+            print('nah')
 
 
-    async def getPopulatedVc(self):
+    async def get_populated_vcs(self):
         voice_channels = []
         
         for server in self.servers_with_tomfoolery_present:
             adquired_server = await self.info_manager.fetch_guild_by_name(server)
-            voice_channels += adquired_server.voice_channels
+            
+            if not any(VcClients.guild.id == adquired_server.id for VcClients in self.bot.voice_clients):
+                voice_channels += adquired_server.voice_channels
 
         print('adquiring populated Vcs')
 
         return [voice_channel for voice_channel in voice_channels if len(voice_channel.voice_states) > 0]
 
 
-    async def performAMinusculeAmountOfDespicableActions(self):
+    async def perform_a_minuscule_amount_of_despicable_actions(self):
         print('doing a little trolling')
 
-        voice_channels = await self.getPopulatedVc()
+        voice_channels = await self.get_populated_vcs()
 
         if len(voice_channels) == 0:
             print('unable to perform the little trolling')

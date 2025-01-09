@@ -1,4 +1,3 @@
-import nextcord
 from nextcord.ext import commands
 from Modules.database_manager import DatabaseManager
 
@@ -16,7 +15,7 @@ class GeneralEvents(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        fetch_locations_query = "SELECT channel, server FROM storedLocations WHERE general_ID = 0"
+        fetch_locations_query = "SELECT channel_ID, server_ID FROM storedLocations WHERE general_ID = 0"
         locations_data = await self.database.fetchall(fetch_locations_query)
 
         for location_record in locations_data:

@@ -21,7 +21,6 @@ intents.members = True
 
 bot = commands.Bot(command_prefix=['aproveita e ', 'Aproveita e '], intents=intents)
 
-
 # class instantiation
 resources = ResourcesPath()
 info_manager = InformationManager(bot)
