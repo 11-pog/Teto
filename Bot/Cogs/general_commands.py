@@ -11,6 +11,15 @@ class GeneralCommands(commands.Cog):
         self.resources = ResourcesPath()
     
     
+    @commands.command(name = "desliga")
+    async def turn_off_bot(self, ctx):
+        if not await PermissionUtils.is_bot_developer(ctx):
+            return
+        
+        await ctx.send("ok tchau")
+        await self.bot.close()
+    
+    
     @commands.command(name = "repita", aliases = ['repete'])
     async def sendMessage(self, ctx, *, message):
         await ctx.send(message)
