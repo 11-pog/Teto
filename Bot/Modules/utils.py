@@ -1,6 +1,11 @@
-#may or may not come to existence
+import zc.lockfile
 
 class Utils:
     @staticmethod
-    async def PlaceHolder():
-        pass
+    def is_duplicate(lock_name):
+        try:
+            lock = zc.lockfile.LockFile(lock_name)
+            return lock
+        except zc.lockfile.LockError:
+            return None
+

@@ -8,8 +8,9 @@ class ResourcesPath:
         self.path_to_images = os.path.join(self.base_path, "Bot", "Resources", "Images")
         self.path_to_databases = os.path.join(self.base_path, "Bot", "Resources", "DataBase")
         self.path_to_texts = os.path.join(self.base_path, "Bot", "Resources", "Text")
+        self.path_to_lock = os.path.join(self.base_path, "Bot", "Resources")
     
-        
+    
     def __call__(self, type):
         match type.lower():
             case "audios" | "audio":
@@ -20,5 +21,7 @@ class ResourcesPath:
                 return self.path_to_databases
             case "texts" | "text":
                 return self.path_to_texts
+            case "lock":
+                return self.path_to_lock
             case _:
                 raise ValueError(f"Resource type {type} is not recognized")

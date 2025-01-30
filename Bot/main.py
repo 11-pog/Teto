@@ -1,8 +1,24 @@
 # main.py
 
+import os
+import time
+from Modules.utils import Utils
+from resources_path import ResourcesPath
+
+
+path = ResourcesPath()
+NAME = os.path.join(path('lock'), 'AutismBOT_LOCK')
+
+lock = Utils.is_duplicate(NAME)
+
+if lock is None:
+    print(f"Process is a duplicate, exiting...")
+    time.sleep(1)
+    exit()
+
+
 # general imports
 import asyncio
-import os
 
 # Main package import
 from nextcord import Intents
@@ -12,6 +28,7 @@ from nextcord.ext import commands
 from Modules.database_manager import DatabaseManager
 from Modules.mischief import Mischief
 from Modules.command_permissions import RolePermissionHandler
+
 
 #Bot Initialization
 intents = Intents.default()
