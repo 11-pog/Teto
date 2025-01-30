@@ -38,10 +38,10 @@ class Mischief:
     
     
     async def QUIT_HAVING_FUN(self):
-        """ENDS THE FUN"""
-        self.scheduler.remove_all_jobs()
-        
+        """ends the fun D:"""
         print('it ends')
+        
+        self.scheduler.remove_all_jobs()
     
     
     async def mischief_interface(self):

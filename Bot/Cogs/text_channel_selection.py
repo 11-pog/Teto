@@ -14,9 +14,6 @@ class TextChannelSelection(commands.Cog):
         # for now thats it
         }
     
-    @commands.Cog.listener()
-    async def on_ready(self):
-        await self.database.connect()
     
     @commands.command(name = "selecionarCanal", aliases = ["selecionarcanal", "channelselect", "channelSelect", "canallembrar", "LEMBRA", 'lembra'])
     async def channelStore(self, ctx, *, msg = None):

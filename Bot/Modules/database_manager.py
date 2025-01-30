@@ -5,15 +5,33 @@ from resources_path import ResourcesPath
 #debug_database_path = r"D:\Quase Importante\Codegos\Python\NextCord\AutismoBOT\Bot\Resources\DataBase\GeneralBotData.db"
 
 class DatabaseManager:
+    _instances = set()
+    
     def __init__(self):
         self.resources = ResourcesPath()
+        self.database = None
+        self.cursor = None
         
         asyncio.run(self.connect())
+        
+        self._instances.add(self)
     
     
     async def connect(self):
         self.database = await aiosqlite.connect(f"{self.resources('database')}/GeneralBotData.db")
         self.cursor = await self.database.cursor()
+    
+    
+    async def disconnect(self):
+        if self.database is not None:
+            await self.database.close()
+    
+    
+    @classmethod
+    async def disconnect_all(cls):
+        for instance in list(cls._instances):
+            await instance.disconnect()
+            cls._instances.remove(instance)
     
     
     async def execute(self, query, parameters = None):
