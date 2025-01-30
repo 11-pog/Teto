@@ -18,8 +18,6 @@ class youtube_playback(commands.Cog):
         self.current_music = {}
         
         self.role_handler = RolePermissionHandler('forbid_audio_playback', 'forbid_youtube_playback')
-        
-        self.downloader_config = YTDLConfig()
     
     async def get_voice_channel_id(self, voice_client):
         return voice_client.channel.id if voice_client else None
@@ -48,7 +46,7 @@ class youtube_playback(commands.Cog):
     
     async def song_info_retriever(self, ctx, url):
         try:
-            return await YTDLSource.get_info_from_url(url, config=self.downloader_config)
+            return await YTDLSource.get_info_from_url(url)
             
         except yt_dlp.DownloadError:
             await ctx.reply("Isso literalmente não existe")
@@ -155,7 +153,7 @@ class youtube_playback(commands.Cog):
     async def play_song(self, ctx, current_song):
         try:          
             async with ctx.typing():
-                playable_song_object = await YTDLSource.stream_from_url(current_song['url'], config=self.downloader_config, loop= self.bot.loop)
+                playable_song_object = await YTDLSource.stream_from_url(current_song['url'], loop= self.bot.loop)
             
             if not ctx.voice_client:
                 return

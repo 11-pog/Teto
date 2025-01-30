@@ -18,8 +18,8 @@ class GeneralEvents(commands.Cog):
     
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        if Utils.has_terminal():
-            return
+        if await Utils.has_terminal():
+            raise error
         
         dev = await self.info.get_bot_dev()
         
