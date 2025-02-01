@@ -34,6 +34,8 @@
 - **<prefix> toca [Link do YouTube] [Parâmetros opcionais]**: Toca uma música ou playlist de uma URL fornecida.
     - Parâmetro opcional: 'embaraia'  ->  se for uma playlist, embaralha ela *antes de adicionar a fila*
 - **<prefix> pula [Opcional: quantidade]**: Pula a música atual ou um número especificado de músicas na fila.
+- **<prefix> pula TUDO**: Pula a fila de música inteira.
+- **<prefix> limpa a fila**: Limpa a fila inteira sem pular a musica atual
 - **<prefix> diz o que tá tocando**: Mostra __*a musica que esta sendo reproduzida nesse momento*__ (talvez ou talvez não dê pra usar a parte sublinhada como alternativa ao comando)
 - **<prefix> diz a fila**: Mostra a fila de musica (numerada) até o numero cêm.
 - **<prefix> embaraia**: Embaralha a fila de músicas atual.

@@ -193,7 +193,7 @@ class youtube_playback(commands.Cog):
     
     
     @commands.command("skip", aliases = ["skipa", "pula"])
-    async def skip(self, ctx, amount = 1):
+    async def skip(self, ctx, amount = None):
         if await self.role_handler.is_user_role_tagged(ctx):
             await ctx.reply("Tu tá BANIDO de musicar")
             return
@@ -201,24 +201,49 @@ class youtube_playback(commands.Cog):
         voice_client = ctx.voice_client
         voice_channel_id = await self.get_voice_channel_id(voice_client)
         
-        if not isinstance(amount, int) or amount <= 0:
+        if amount is None or not isinstance(amount, (int, str)) or (isinstance(amount, int) and amount <= 0):
             amount = 1
         
         if voice_client:
             await self.initialize_dicts(ctx)
             
-            if amount > 1 and len(self.music_queue[voice_channel_id]) >= amount:
+            if isinstance(amount, str) and amount.strip().lower() in ['tudo', 'all', 'todos', 'todes']:
+                await self.skip_all(ctx, voice_channel_id)
+            elif amount > 1 and len(self.music_queue[voice_channel_id]) >= amount:
                 del self.music_queue[voice_channel_id][:amount - 1]
-                
+                await ctx.reply("tá")
             elif amount > 1:
                 await ctx.send("Como que skipa um numero maior que a fila porra")
                 await ctx.send(f"(Nota: a fila tem {len(self.music_queue[voice_channel_id]) + 1} musicas)")
                 return
-                
+            
             voice_client.stop()
-            await ctx.reply("tá")
         else:
             await ctx.reply("Oque, porra")
+    
+    async def skip_all(self, ctx, channel):
+            self.music_queue[channel] = []
+            self.current_music[channel] = None
+            await ctx.reply("Carai tudin? tabão")
+    
+    
+    @commands.command(name='limpa', aliases = ['clean', 'limpar', 'esvazia'])
+    async def clear_queue(self, ctx, *, command_part_2 = None):
+        if not command_part_2 or unidecode(command_part_2.strip().lower()) not in ['a fila', 'as musica']:
+            return
+        
+        if await self.role_handler.is_user_role_tagged(ctx):
+            await ctx.reply("Tu tá BANIDO de musicar")
+            return
+        
+        channel_id = await self.get_voice_channel_id(ctx.voice_client)
+        
+        if not channel_id:
+            await ctx.reply('Oque, porra')
+            return
+        
+        self.music_queue[channel_id] = []
+        await ctx.send('ok')
     
     
     @commands.command("playing", aliases = ["diz", "fala"])
