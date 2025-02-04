@@ -2,37 +2,32 @@ import asyncio
 import nextcord
 from nextcord.ext import commands
 
-from Modules.command_permissions import RolePermissionHandler
-
+from Modules.command_utils import command_extension
+from Modules.command_permissions import role_blacklisted
 
 
 class VoiceChatCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.ping_list = set()
-        
-        self.blacklister = RolePermissionHandler("forbid_audio_playback", "forbid_voice_chat_control")
+    
     
     @commands.command("joinCall", aliases = ["entra"])
-    async def joinCall(self, ctx, a1):
-        if await self.blacklister.is_user_role_tagged(ctx):
-            await ctx.reply("Tu tá BANIDO de mandar o bot coisar na call")
-            return
-        
-        if a1 in ["ai", "ae"]:
-            if hasattr(ctx.author.voice, 'channel'):
-                await ctx.reply("ok <:cat:1264072257433632789>")
-                await ctx.author.voice.channel.connect()
-            else:
-                await ctx.reply("Tenta entrar na call primeiro")
+    @command_extension("ai", "ae")
+    @role_blacklisted("forbid_audio_playback", "forbid_voice_chat_control",
+        rejection_message="Tu tá BANIDO de mandar o bot coisar na call")
+    async def joinCall(self, ctx):
+        if hasattr(ctx.author.voice, 'channel'):
+            await ctx.reply("ok <:cat:1264072257433632789>")
+            await ctx.author.voice.channel.connect()
+        else:
+            await ctx.reply("Tenta entrar na call primeiro")
     
     
     @commands.command("leaveCall", aliases = ["vaza", "sai"])
+    @role_blacklisted("forbid_audio_playback", "forbid_voice_chat_control",
+        rejection_message="Tu tá BANIDO de mandar o bot coisar na call")
     async def leaveCall(self, ctx):
-        if await self.blacklister.is_user_role_tagged(ctx):
-            await ctx.reply("Tu tá BANIDO de mandar o bot coisar na call")
-            return
-        
         current_call = ctx.voice_client
         
         if current_call:

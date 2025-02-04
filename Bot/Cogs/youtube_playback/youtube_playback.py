@@ -7,10 +7,11 @@ from unidecode import unidecode
 
 import yt_dlp
 
+from Modules.command_utils import command_extension
 from resources_path import resources_path
 from Modules.cache import JsonCache
 from Cogs.youtube_playback.YTDLSource import YTDLSource
-from Modules.command_permissions import RolePermissionHandler
+from Modules.command_permissions import role_blacklisted
 
 class youtube_playback(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -21,8 +22,6 @@ class youtube_playback(commands.Cog):
         
         cache_file_path = os.path.join(resources_path('cache'), 'yt-playback_info_cache.json')
         self.info_cache = JsonCache(cache_file_path, size_limit=50000)
-        
-        self.role_handler = RolePermissionHandler('forbid_audio_playback', 'forbid_youtube_playback')
     
     async def get_voice_channel_id(self, voice_client):
         return voice_client.channel.id if voice_client else None
@@ -80,11 +79,8 @@ class youtube_playback(commands.Cog):
     
     
     @commands.command("play", aliases = ["toca"])
+    @role_blacklisted('forbid_audio_playback', 'forbid_youtube_playback', rejection_message= "Tu tá BANIDO de musicar")
     async def extract_command_parameters(self, ctx, *, query):
-        if await self.role_handler.is_user_role_tagged(ctx):
-            await ctx.reply("Tu tá BANIDO de musicar")
-            return
-        
         command_list = query.split()
         voice_client = ctx.voice_client
         
@@ -193,11 +189,8 @@ class youtube_playback(commands.Cog):
     
     
     @commands.command("skip", aliases = ["skipa", "pula"])
+    @role_blacklisted('forbid_audio_playback', 'forbid_youtube_playback', rejection_message= "Tu tá BANIDO de musicar")
     async def skip(self, ctx, amount = None):
-        if await self.role_handler.is_user_role_tagged(ctx):
-            await ctx.reply("Tu tá BANIDO de musicar")
-            return
-        
         voice_client = ctx.voice_client
         voice_channel_id = await self.get_voice_channel_id(voice_client)
         
@@ -228,14 +221,9 @@ class youtube_playback(commands.Cog):
     
     
     @commands.command(name='limpa', aliases = ['clean', 'limpar', 'esvazia'])
-    async def clear_queue(self, ctx, *, command_part_2 = None):
-        if not command_part_2 or unidecode(command_part_2.strip().lower()) not in ['a fila', 'as musica']:
-            return
-        
-        if await self.role_handler.is_user_role_tagged(ctx):
-            await ctx.reply("Tu tá BANIDO de musicar")
-            return
-        
+    @command_extension('a fila', 'as musica')
+    @role_blacklisted('forbid_audio_playback', 'forbid_youtube_playback', rejection_message= "Tu tá BANIDO de musicar")
+    async def clear_queue(self, ctx):
         channel_id = await self.get_voice_channel_id(ctx.voice_client)
         
         if not channel_id:
@@ -292,16 +280,15 @@ class youtube_playback(commands.Cog):
     
     
     @commands.command("shuffle", aliases = ["embaralha", "embaraia"])
+    @role_blacklisted(
+        'forbid_audio_playback', 'forbid_youtube_playback',
+        rejection_message= "Tu tá BANIDO de musicar")
     async def shuffle_list(self, ctx):
-        if await self.role_handler.is_user_role_tagged(ctx):
-            await ctx.reply("Tu tá BANIDO de musicar")
-            return
-        
         voice_channel_id = await self.get_voice_channel_id(ctx.voice_client)
         
         if voice_channel_id in self.music_queue and len(self.music_queue[voice_channel_id]) > 0:
             random.shuffle(self.music_queue[voice_channel_id])
-            await ctx.reply("Ok tá bem aleatorio")
+            await ctx.reply("Ok tá bem aleatório")
         
         else:
             await ctx.send("que?")

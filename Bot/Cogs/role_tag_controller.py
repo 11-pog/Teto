@@ -1,9 +1,10 @@
 import nextcord
 from nextcord.ext import commands
 
+from Modules.command_utils import command_extension
 from Modules.information_manager import InformationManager
 from Modules.database_manager import DatabaseManager
-from Modules.command_permissions import PermissionUtils
+from Modules.command_permissions import is_bot_developer, moderator
 
 class RolePermissionController(commands.Cog):
     def __init__(self, bot):
@@ -13,14 +14,16 @@ class RolePermissionController(commands.Cog):
     
     
     
-    @commands.command(name="permissão-de-cargo")
+    @commands.command(name="permissão")
+    @command_extension("de cargo", "pro cargo")
+    @moderator()
     async def mark_role_permission(self, ctx, role_mention = None, category = None, *, other = None):
         role_object = await self._is_command_valid(ctx, role_mention, category)
         
         if role_object is None:
             return
         
-        global_role = other is not None and 'global-role' in other and PermissionUtils.is_bot_developer(ctx)
+        global_role = other is not None and 'global-role' in other and is_bot_developer(ctx)
         
         if global_role:
             print(f'Added "{role_object.name}" role to global role permissions')
@@ -38,9 +41,6 @@ class RolePermissionController(commands.Cog):
     
     
     async def _is_command_valid(self, ctx, role_mention, category):
-        if not await PermissionUtils.is_moderator(ctx):
-            return None
-        
         if role_mention is None or category is None:
             await ctx.send("Dexa de ser burro")
             return None
@@ -54,7 +54,9 @@ class RolePermissionController(commands.Cog):
         return role_object
     
     
-    @commands.command(name="un-permissão-de-cargo")
+    @commands.command(name="despermissão")
+    @command_extension("de cargo", "pro cargo")
+    @moderator()
     async def remove_blacklist(self, ctx):
         pass
         #amanha eu faço

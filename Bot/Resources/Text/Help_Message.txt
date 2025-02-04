@@ -74,5 +74,5 @@ lista de categorias de permissão:
 - **"forbid_voice_chat_control"**  ->  Impede apenas o uso de comandos de controle de call (entrar e sair)
 
 comandos:
-- **"<prefix> permissão-de-cargo [cargo] [categoria]"**: Define a categoria de permissão para o cargo especificado.
-- **"<prefix> un-permissão-de-cargo [cargo] [categoria]"**: __**WIP**__ Remove a categoria de permissão para o cargo especificado.
+- **"<prefix> permissão de cargo [cargo] [categoria]"**: Define a categoria de permissão para o cargo especificado.
+- **"<prefix> despermissão de cargo [cargo] [categoria]"**: __**WIP**__ Remove a categoria de permissão para o cargo especificado.

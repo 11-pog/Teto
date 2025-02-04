@@ -5,13 +5,14 @@ from resources_path import resources_path
 class DatabaseManager:
     _instances = set()
     
-    def __init__(self):
+    def __init__(self, auto_connect = True):
         self.loop = None
         
         self.database = None
         self.cursor = None
         
-        asyncio.run(self.connect())
+        if auto_connect:
+            asyncio.run(self.connect())
         
         self._instances.add(self)
     
@@ -20,7 +21,6 @@ class DatabaseManager:
             self.loop.run_until_complete(self.database.close())
         
         self._instances.discard(self)
-    
     
     
     async def connect(self):

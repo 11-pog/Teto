@@ -26,7 +26,7 @@ from nextcord.ext import commands
 # other files import
 from Modules.database_manager import DatabaseManager
 from Modules.mischief import Mischief
-from Modules.command_permissions import RolePermissionHandler
+from Modules.command_permissions import Permission, is_user_role_tagged
 
 
 #Bot Initialization
@@ -35,10 +35,9 @@ intents = Intents.default()
 intents.message_content = True
 intents.members = True
 
-bot = commands.Bot(command_prefix=['aproveita e ', 'Aproveita e '], intents=intents, help_command= None)
+bot = commands.Bot(command_prefix=['aproveita e '], intents=intents, help_command= None, case_insensitive=True)
+bot.loop.create_task(Permission.database_init())
 
-# class instantiation
-bot_usage_permission = RolePermissionHandler('forbid_BOT')
 
 i_am_afraid = Mischief(bot,
     servers_with_tomfoolery_present= [
@@ -63,7 +62,6 @@ bot.load_extensions([
     'Cogs.role_tag_controller',
     ])
 
-
 @bot.event
 async def on_ready():
     print(f"Bot is online! Username: {bot.user.name} | ID: {bot.user.id}")
@@ -76,7 +74,7 @@ async def on_ready():
 
 @bot.event
 async def on_message(msg):
-    if msg.content.startswith(tuple(await bot.get_prefix(msg))) and await bot_usage_permission.is_user_role_tagged(msg):
+    if msg.content.startswith(tuple(await bot.get_prefix(msg))) and await is_user_role_tagged(msg, 'forbid_BOT'):
         print(f'Blacklisted user "{msg.author.name}" tried using bot in {msg.guild.name}, {msg.channel.name}')
         return
     

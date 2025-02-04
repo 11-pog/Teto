@@ -1,13 +1,11 @@
-import asyncio
 import os
-import signal
-import sys
 
 import nextcord
 from nextcord.ext import commands
 
+from Modules.command_utils import command_extension
 from resources_path import resources_path
-from Modules.command_permissions import PermissionUtils
+from Modules.command_permissions import bot_dev, is_moderator
 
 class GeneralCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -15,10 +13,8 @@ class GeneralCommands(commands.Cog):
     
     
     @commands.command(name = "desliga")
+    @bot_dev()
     async def turn_off_bot(self, ctx):
-        if not await PermissionUtils.is_bot_developer(ctx):
-            return
-        
         await ctx.send("ok tchau")
         await self.bot.close()
         print('Desligando')
@@ -46,12 +42,6 @@ class GeneralCommands(commands.Cog):
         #    print(f"{x}")
         await ctx.author.send(f"<:trol:968658017086242897>")
     
-    # Comando de ser xingado ai que triste
-    @commands.command(name = "xingamento", aliases = ["si", "se", "vai"])
-    async def spongbop(self, ctx, *, confirm):
-        if confirm in ["mata", "mata mlk", "se fude", "si fude", "sifude", "se foder", "sifuder", "si fuder", "pro caralho", "pra merda", "catar coquinho", "toma no cu"]:
-            await ctx.reply("<:spong_bop:1264260742975197264>")
-    
     
     @commands.command(name = "autista")
     async def sendImage(self, ctx):
@@ -64,7 +54,7 @@ class GeneralCommands(commands.Cog):
     @commands.command(name = "ayuda", aliases = ['ajuda', 'helpa', 'help'])
     async def test(self, ctx, *, args = None):
         help_text_file_path = os.path.join(resources_path('text'), "Help_message.txt")
-        is_mod = await PermissionUtils.is_moderator(ctx)
+        is_mod = await is_moderator(ctx)
         only_mod = args is not None and 'só mod' in args.lower()
         
         with open(help_text_file_path, encoding='UTF-8') as f:

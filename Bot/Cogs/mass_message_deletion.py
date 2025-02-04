@@ -1,7 +1,7 @@
 import asyncio
 from nextcord.ext import commands
 
-from Modules.command_permissions import PermissionUtils
+from Modules.command_permissions import moderator
 
 class MassMessageDeletion(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -11,10 +11,8 @@ class MassMessageDeletion(commands.Cog):
     
     # Pra marcar
     @commands.command(name = "toMark", aliases = ["marca"])
+    @moderator()
     async def mark(self, ctx):
-        if not await PermissionUtils.is_moderator(ctx):
-            return
-        
         channelID = ctx.channel.id
         if channelID not in self.message_deletion_dict:
             self.message_deletion_dict[channelID] = []
@@ -26,10 +24,8 @@ class MassMessageDeletion(commands.Cog):
     
     # Pra deletar
     @commands.command(name = "toDelete", aliases = ["deleta"])
+    @moderator()
     async def delete(self, ctx):
-        if not await PermissionUtils.is_moderator(ctx):
-            return
-        
         channel_id = ctx.channel.id
         
         if not channel_id in self.message_deletion_dict:

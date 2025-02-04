@@ -2,7 +2,7 @@ import asyncio
 from nextcord.ext import commands
 from Modules.database_manager import DatabaseManager
 
-from Modules.command_permissions import PermissionUtils
+from Modules.command_permissions import moderator
 
 class TextChannelSelection(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -15,11 +15,9 @@ class TextChannelSelection(commands.Cog):
         }
     
     
-    @commands.command(name = "selecionarCanal", aliases = ["selecionarcanal", "channelselect", "channelSelect", "canallembrar", "LEMBRA", 'lembra'])
+    @commands.command(name = "selecionarCanal", aliases = ["channelselect", "canallembrar", 'lembra'])
+    @moderator()
     async def channelStore(self, ctx, *, msg = None):
-        if not await PermissionUtils.is_moderator(ctx):
-            return
-        
         if msg is None:
             await ctx.send("que, lembrar do que?")
         
@@ -49,11 +47,9 @@ class TextChannelSelection(commands.Cog):
     
     
     
-    @commands.command(name = "esquecerCanal", aliases = ["esquecercanal", "ESQUECE", "ESQUEÇE", "esquece", "esqueçe"])
+    @commands.command(name = "esquecerCanal", aliases = ["ESQUECE"])
+    @moderator()
     async def channelForget(self, ctx, *, msg = None):
-        if not await PermissionUtils.is_moderator(ctx):
-            return
-        
         if msg is None:
             await ctx.send("que, esquecer o que?")
         

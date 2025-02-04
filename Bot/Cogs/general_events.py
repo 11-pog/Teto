@@ -1,7 +1,7 @@
 import asyncio
 import signal
 from nextcord.ext import commands
-from Modules.utils import Utils
+from Modules.utils import StringUtils, Utils
 from Modules.information_manager import InformationManager
 from Modules.database_manager import DatabaseManager
 
@@ -18,9 +18,16 @@ class GeneralEvents(commands.Cog):
     
     
     @commands.Cog.listener()
-    async def on_message(self, message):
-        if str.lower(message.content) == 'fat fuck' and message.author.id != self.bot.user.id:
-            await message.channel.send(message.content)
+    async def on_message(self, msg):
+        if str.lower(msg.content) == 'fat fuck' and msg.author.id != self.bot.user.id:
+            await msg.channel.send(msg.content)
+        
+        
+        elif str.lower(msg.content).startswith(tuple(await self.bot.get_prefix(msg))):
+            the_big_forbidden_list_of_bad_words = await Utils.get_the_forbidden_list()
+            
+            if any(bad_word in StringUtils.clean(msg.content) for bad_word in the_big_forbidden_list_of_bad_words):
+                await msg.reply("<:spong_bop:1264260742975197264>")
     
     
     @commands.Cog.listener()
