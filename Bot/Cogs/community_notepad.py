@@ -1,7 +1,7 @@
 import asyncio
 from nextcord.ext import commands
 
-from Modules.command_utils import command_extension
+from Modules.command_extension import command_extension
 from Modules.cache import QuickCache
 from Modules.database_manager import DatabaseManager
 

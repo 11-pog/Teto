@@ -3,7 +3,7 @@ import os
 import nextcord
 from nextcord.ext import commands
 
-from Modules.command_utils import command_extension
+from Modules.command_extension import command_extension
 from resources_path import resources_path
 from Modules.command_permissions import bot_dev, is_moderator
 

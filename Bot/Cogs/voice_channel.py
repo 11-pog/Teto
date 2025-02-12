@@ -2,7 +2,7 @@ import asyncio
 import nextcord
 from nextcord.ext import commands
 
-from Modules.command_utils import command_extension
+from Modules.command_extension import command_extension
 from Modules.command_permissions import role_blacklisted
 
 
