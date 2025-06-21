@@ -1,22 +1,40 @@
-from discord.ext.commands import Bot
-from discord import app_commands
+from discord.ext import commands
+from Modules.mischief import Mischief
+from Modules.database_manager import DatabaseManager
+from Modules.command_permissions import Permission
 
-class BotClient(Bot):
-    def __init__(self, command_prefix, *, help_command = ..., tree_cls = app_commands.CommandTree, description = None, allowed_contexts = ..., allowed_installs = ..., intents, **options):
-        super().__init__(command_prefix, help_command=help_command, tree_cls=tree_cls, description=description, allowed_contexts=allowed_contexts, allowed_installs=allowed_installs, intents=intents, **options)
+class startup(commands.Cog):
+    def __init__(self, bot: commands.Bot):
+        self.bot = bot
+        
+        self.fnuuy = Mischief(bot,
+            servers_with_tomfoolery_present= [
+                "Whatsapp 2",
+                "Bot Testing Ground",
+                "VILA DO CHAVES"
+                ],
+            chance_denominator=110,
+            interval_in_seconds = 12
+            )
     
-    async def setup_hook(self):
-        await self.load_extension('startup_cog')
+    
+    async def cog_load(self):
+        await DatabaseManager.connect()
+        print("DatabaseManager: Database has Connected")
+
+        await Permission.database_init()
+        print("Permission: Permission database has been Setup")
+    
+    
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print(f"Bot is online! Username: {self.bot.user.name} | ID: {self.bot.user.id}")
+        print("Connected to the following guilds:")
+        for guild in self.bot.guilds:
+            print(f" - {guild.name} (ID: {guild.id})")
         
-        #await bot.load_extension('Modules.command_manipulation.shared_command_system')
-        #await bot.load_extension('Cogs.test')
-        
-        await self.load_extension('Cogs.developer_exclusive')
-        await self.load_extension('Cogs.general_commands')
-        await self.load_extension('Cogs.general_events')
-        await self.load_extension('Cogs.voice_channel')
-        await self.load_extension('Cogs.community_notepad')
-        await self.load_extension('Cogs.youtube_playback.youtube_playback')
-        await self.load_extension('Cogs.text_channel_selection')
-        await self.load_extension('Cogs.mass_message_deletion')
-        await self.load_extension('Cogs.role_tag_controller')
+        await self.fnuuy.commence_moderate_mischief()
+
+
+async def setup(bot: commands.Bot):
+    await bot.add_cog(startup(bot))
