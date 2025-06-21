@@ -13,27 +13,25 @@ if lock is None:
     time.sleep(1)
     exit()
 
-# general imports
 
 # Main package import
 import discord
 
 from discord import Intents
+from bot import BotClient
 
-from startup import BotClient
 
-# other files import
+# Module import
 from Modules.database_manager import DatabaseManager
 from Modules.command_permissions import is_user_role_tagged
 
 
-#Bot Initialization
+#Bot Instantiation
 intents = Intents.default()
 
 intents.message_content = True
 intents.members = True
 
-# Custom Bot Class
 bot = BotClient(command_prefix=['aproveita e '], intents=intents, help_command= None, case_insensitive=True)
 
 
@@ -48,5 +46,3 @@ async def on_message(msg: discord.Message):
 
 if __name__ == '__main__':
     bot.run(os.environ['AUTISM_DISCORD_TOKEN'])
-    DatabaseManager.disconnect()
-    print("Shutted down lmao")

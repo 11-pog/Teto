@@ -7,22 +7,19 @@ from resources_path import resources_path
 class DatabaseManager:
     database = None
     cursor = None
-    loop = None
     
     def __init__(self):
         pass
     
     @classmethod
     async def connect(cls):
-        cls.loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
-        
         cls.database = await aiosqlite.connect(f"{resources_path('database')}/GeneralBotData.db")
         cls.cursor = await cls.database.cursor()
     
     @classmethod
-    def disconnect(cls):
-        if cls.database is not None and cls.loop is not None:
-            cls.loop.create_task(cls.database.close())
+    async def disconnect(cls):
+        if cls.database is not None:
+            await cls.database.close()
     
     @staticmethod
     def _requires_connection(func: Callable[..., Any]) -> Callable[..., Any]:

@@ -15,7 +15,6 @@ class DevOnlyCommands(commands.Cog):
     async def turn_off_bot(self, ctx: Context[Any]):
         await ctx.send("ok tchau")
         await self.bot.close()
-        print('Desligando')
     
     #@commands.command(name = "idget")
     #async def get_user_id(self, ctx):
