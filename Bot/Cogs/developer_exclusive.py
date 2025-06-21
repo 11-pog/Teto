@@ -1,4 +1,6 @@
+from typing import Any
 from nextcord.ext import commands
+from nextcord.ext.commands import Context
 from Modules.command_permissions import developer
 
 class dev_exclusive(commands.Cog):
@@ -7,7 +9,7 @@ class dev_exclusive(commands.Cog):
     
     @commands.command(name = "desliga")
     @developer()
-    async def turn_off_bot(self, ctx):
+    async def turn_off_bot(self, ctx: Context[Any]):
         await ctx.send("ok tchau")
         await self.bot.close()
         print('Desligando')

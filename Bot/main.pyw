@@ -13,11 +13,12 @@ if lock is None:
     exit()
 
 # general imports
-import asyncio
+import asyncio, nextcord
 
 # Main package import
 from nextcord import Intents
 from nextcord.ext import commands
+from nextcord.abc import GuildChannel
 
 # other files import
 from Modules.database_manager import DatabaseManager
@@ -66,6 +67,7 @@ bot.load_extensions([
 
 @bot.event
 async def on_ready():
+    assert bot.user is not None
     print(f"Bot is online! Username: {bot.user.name} | ID: {bot.user.id}")
     print("Connected to the following guilds:")
     for guild in bot.guilds:
@@ -75,8 +77,11 @@ async def on_ready():
 
 
 @bot.event
-async def on_message(msg):
-    if msg.content.startswith(tuple(await bot.get_prefix(msg))) and await is_user_role_tagged(msg, 'forbid_BOT'):
+async def on_message(msg: nextcord.Message):
+    if msg.content.startswith(tuple(await bot.get_prefix(msg))) and await is_user_role_tagged(await bot.get_context(msg), 'forbid_BOT'):
+        assert msg.guild is not None and msg.channel is not None
+        assert isinstance(msg.channel, GuildChannel)
+        
         print(f'Blacklisted user "{msg.author.name}" tried using bot in {msg.guild.name}, {msg.channel.name}')
         return
     

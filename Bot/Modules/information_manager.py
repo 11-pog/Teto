@@ -75,5 +75,5 @@ class InformationManager:
     
     
     async def get_bot_dev(self):
-        bot_developer_id = os.environ['MINE_DISCORD_ID']
+        bot_developer_id = int(os.environ['MINE_DISCORD_ID'])
         return await self.fetch_member_by_id(bot_developer_id)

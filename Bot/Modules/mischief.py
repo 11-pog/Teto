@@ -1,6 +1,7 @@
 # mischief.py
 
 import os, random, nextcord, asyncio
+from typing import Any, Dict, List
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
@@ -34,10 +35,13 @@ class Mischief:
     
     
     async def _setup(self):
-        servers = []
+        servers: List[nextcord.Guild] = []
         
         for guild in self.servers_with_tomfoolery_present:
-            servers.append(await self.info.fetch_guild_by_name(guild))
+            found_server = await self.info.fetch_guild_by_name(guild)
+            
+            if found_server is not None:
+                servers.append(found_server)
         
         self.guilds = servers
     
@@ -52,7 +56,6 @@ class Mischief:
     async def mischief_interface(self):
         try:
             if random.randint(1, self.chance_denominator) == 1:
-                
                 await self.perform_a_minuscule_amount_of_despicable_actions()
         except Exception as e:
             await self.on_error(e)
@@ -60,7 +63,7 @@ class Mischief:
         # decided to omit the print stating it didn't happen because it would pollute the output way too much
     
     
-    async def on_error(self, error):
+    async def on_error(self, error: Exception):
         if await Utils.has_terminal():
             raise error
         
@@ -97,7 +100,9 @@ class Mischief:
         
         audio_path, audio_name = await self.get_random_audio()
         source = nextcord.FFmpegPCMAudio(audio_path)
+        
         vc_bot_client = self.bot.voice_clients[0]
+        assert isinstance(vc_bot_client, nextcord.VoiceClient)
         
         await asyncio.sleep(random.randint(1, 10))
         
@@ -105,7 +110,7 @@ class Mischief:
             if err:
                 print(err)
             await asyncio.sleep(random.uniform(0, 0.6))  
-            await vc_bot_client.disconnect() 
+            await vc_bot_client.disconnect()
         
         vc_bot_client.play(source, after = stop)
         print(f"Mischief: Love me some {audio_name}")

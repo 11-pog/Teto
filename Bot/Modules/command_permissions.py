@@ -1,11 +1,11 @@
-import asyncio, functools, os
+import asyncio, functools, os, nextcord
 
-from typing import Tuple
-from Modules.utils import Utils
+from typing import Any, Awaitable, Callable
 from Modules.database_manager import DatabaseManager
+from nextcord.ext.commands import Context
 
 class Permission:
-    database = DatabaseManager(auto_connect=False)
+    database: DatabaseManager = DatabaseManager(auto_connect=False)
     
     # Class Methods
     @classmethod
@@ -21,7 +21,7 @@ class Permission:
         })
     
     @classmethod
-    async def _fetch_roles_from_database(cls, ctx, category):
+    async def _fetch_roles_from_database(cls, ctx: Context, category):
         all_category = 'ALL' in category
         
         query = await Permission._build_query(all_category, category)
@@ -44,7 +44,7 @@ class Permission:
     
     
     @staticmethod
-    async def _build_parameters(ctx, all, category):
+    async def _build_parameters(ctx: Context, all, category):
         parameters = []
         
         if not all:
@@ -58,22 +58,27 @@ class Permission:
 
 
 # functions (that may be used)
-async def is_user_role_tagged(ctx, *category):
+async def is_user_role_tagged(ctx: Context[Any], *category):
     blacklisted_roles = await Permission._fetch_roles_from_database(ctx, category)
     
     return any(user_role.name == blacklisted_role[0] for blacklisted_role in blacklisted_roles for user_role in ctx.author.roles)
 
-async def is_moderator(ctx):
+async def is_moderator(ctx: Context | nextcord.Message):
     return ctx.author.guild_permissions.administrator
 
-async def is_bot_developer(ctx):
-    bot_developer_id = os.environ['MINE_DISCORD_ID']
+async def is_bot_developer(ctx: Context):
+    bot_developer_id = os.environ['BOT_DEV_DISCORD_ID']
     return ctx.author.id == int(bot_developer_id)
 
 
 
 # template
-def generic_decorator(check, *args, rejection_message = None, invert = False):
+def _generic_decorator(
+    check: Callable[..., Awaitable[bool]], 
+    *args, 
+    rejection_message: str = None, 
+    invert: bool = False
+    ):
     if invert:
         async def check_func(ctx, *args):
             return not await check(ctx, *args)
@@ -81,13 +86,21 @@ def generic_decorator(check, *args, rejection_message = None, invert = False):
         async def check_func(ctx, *args):
             return await check(ctx, *args)
     
+    if rejection_message:
+        async def reply(ctx: Context):
+            await ctx.reply(rejection_message)
+    else:
+        async def reply(ctx: Context):
+            return
+    
     def decorator(func):
         @functools.wraps(func)
-        async def wrapper(self, ctx, *func_args, **func_kwargs):
+        async def wrapper(self, ctx: Context, *func_args, **func_kwargs):
             if await check_func(ctx, *args):
                 return await func(self, ctx, *func_args, **func_kwargs)
-            elif rejection_message:
-                await ctx.reply(rejection_message)
+            else:
+                await reply(ctx)
+        
         return wrapper
     return decorator
 
@@ -95,14 +108,14 @@ def generic_decorator(check, *args, rejection_message = None, invert = False):
 
 # decorators
 def moderator(rejection_message: str = None):
-    return generic_decorator(is_moderator, rejection_message=rejection_message)
+    return _generic_decorator(is_moderator, rejection_message=rejection_message)
 
 def developer(rejection_message: str = None):
-    return generic_decorator(is_bot_developer, rejection_message=rejection_message)
+    return _generic_decorator(is_bot_developer, rejection_message=rejection_message)
 
 
 def role_blacklisted(*category, rejection_message: str = None):
-    return generic_decorator(
+    return _generic_decorator(
         is_user_role_tagged,
         *category,
         rejection_message=rejection_message,
@@ -110,7 +123,7 @@ def role_blacklisted(*category, rejection_message: str = None):
     )
 
 def role_whitelisted(*category, rejection_message: str = None):
-    return generic_decorator(
+    return _generic_decorator(
         is_user_role_tagged,
         *category,
         rejection_message=rejection_message,

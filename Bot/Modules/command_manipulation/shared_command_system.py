@@ -1,3 +1,4 @@
+'''
 import functools
 from nextcord.ext import commands
 
@@ -59,5 +60,6 @@ class SharedCommand(commands.Cog):
 
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(SharedCommand(bot))
+'''

@@ -10,7 +10,7 @@ path_to_cache = os.path.join(base_path, "Bot", "Resources", "Cache")
 path_to_lock = os.path.join(base_path, "Bot", "Resources")
 
 
-def resources_path(type):
+def resources_path(type: str) -> str:
     match type.lower():
         case "audios" | "audio":
             return path_to_audios
