@@ -1,6 +1,6 @@
-import asyncio, nextcord
+import asyncio, discord
 
-from nextcord.ext import commands
+from discord.ext import commands
 from Modules.command_manipulation.command_extension import command_extension
 from Modules.command_permissions import role_blacklisted
 
@@ -8,6 +8,10 @@ class VoiceChatCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.ping_list = set()
+    
+    
+    async def cog_load(self):
+        print(f"Cog Loaded: {self.__cog_name__}")
     
     
     @commands.command("joinCall", aliases = ["entra"])
@@ -64,12 +68,12 @@ class VoiceChatCommands(commands.Cog):
             try:
                 await voice_client.channel.guild.me.edit(nick="Autista")
                 print(f"Ping! in '{voice_client.channel.guild.name}'")
-            except nextcord.ClientException:
+            except discord.ClientException:
                 pass
             await asyncio.sleep(15)
 
 
 
 
-def setup(bot):
-    bot.add_cog(VoiceChatCommands(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(VoiceChatCommands(bot))

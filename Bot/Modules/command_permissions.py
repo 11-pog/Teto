@@ -1,16 +1,15 @@
-import asyncio, functools, os, nextcord
+import functools, os, discord
 
 from typing import Any, Awaitable, Callable
 from Modules.database_manager import DatabaseManager
-from nextcord.ext.commands import Context
+from discord.ext.commands import Context
 
 class Permission:
-    database: DatabaseManager = DatabaseManager(auto_connect=False)
+    database: DatabaseManager = DatabaseManager()
     
     # Class Methods
     @classmethod
     async def database_init(cls):
-        await cls.database.connect()
         await cls.database.setup(
             structure={
                 'permissionTaggedRoles': {
@@ -63,7 +62,7 @@ async def is_user_role_tagged(ctx: Context[Any], *category):
     
     return any(user_role.name == blacklisted_role[0] for blacklisted_role in blacklisted_roles for user_role in ctx.author.roles)
 
-async def is_moderator(ctx: Context | nextcord.Message):
+async def is_moderator(ctx: Context | discord.Message):
     return ctx.author.guild_permissions.administrator
 
 async def is_bot_developer(ctx: Context):

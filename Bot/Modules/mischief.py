@@ -1,6 +1,6 @@
 # mischief.py
 
-import os, random, nextcord, asyncio
+import os, random, discord, asyncio
 from typing import Any, Dict, List
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -12,7 +12,7 @@ from resources_path import resources_path
 class Mischief:
     """A considerably small amount of mischief will be caused.
     """
-    def __init__(self, bot: nextcord.Client, *, servers_with_tomfoolery_present: list[str], chance_denominator: int = 100, interval_in_seconds: int = 10):
+    def __init__(self, bot: discord.Client, *, servers_with_tomfoolery_present: list[str], chance_denominator: int = 100, interval_in_seconds: int = 10):
         self.bot = bot
         self.info = InformationManager(self.bot)
         
@@ -27,7 +27,7 @@ class Mischief:
     async def commence_moderate_mischief(self):
         """STARTS THE FUN
         """
-        print('it starts')
+        print('Mischief: Initialized the funny lmao xdxd')
         await self._setup()
         
         self.scheduler_jobs_dict['theTrollingJob'] = self.scheduler.add_job(self.mischief_interface, 'interval', seconds = self.interval)
@@ -35,7 +35,7 @@ class Mischief:
     
     
     async def _setup(self):
-        servers: List[nextcord.Guild] = []
+        servers: List[discord.Guild] = []
         
         for guild in self.servers_with_tomfoolery_present:
             found_server = await self.info.fetch_guild_by_name(guild)
@@ -99,10 +99,10 @@ class Mischief:
         await random.choice(voice_channels).connect()
         
         audio_path, audio_name = await self.get_random_audio()
-        source = nextcord.FFmpegPCMAudio(audio_path)
+        source = discord.FFmpegPCMAudio(audio_path)
         
         vc_bot_client = self.bot.voice_clients[0]
-        assert isinstance(vc_bot_client, nextcord.VoiceClient)
+        assert isinstance(vc_bot_client, discord.VoiceClient)
         
         await asyncio.sleep(random.randint(1, 10))
         

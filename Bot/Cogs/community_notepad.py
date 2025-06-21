@@ -1,6 +1,6 @@
 import asyncio
 
-from nextcord.ext import commands
+from discord.ext import commands
 from Modules.command_manipulation.command_extension import command_extension
 from Modules.cache import QuickCache
 from Modules.database_manager import DatabaseManager
@@ -10,16 +10,16 @@ class CommunityNotepad(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.database = DatabaseManager()
-        
-        task = self.database.setup(structure={
+    
+    async def cog_load(self):
+        await self.database.setup(structure={
             'communityNotepad': {
                 'message': 'TEXT',
                 'author_ID': 'INTEGER',
                 'server_ID': 'INTEGER'
             }
         })
-        asyncio.run(task)
-    
+        print(f"Cog Loaded: {self.__cog_name__}")
     
     @commands.command(name = "notePadWrite", aliases = ["anota"])
     @command_extension('pra mim')
@@ -116,5 +116,5 @@ class CommunityNotepad(commands.Cog):
                 await ctx.send("O burro tu tem q especificar os numero (baseado na sua lista de notas)")
 
 
-def setup(bot):
-    bot.add_cog(CommunityNotepad(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(CommunityNotepad(bot))

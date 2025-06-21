@@ -1,6 +1,6 @@
 '''
 import functools
-from nextcord.ext import commands
+from discord.ext import commands
 
 from Modules.utils import IterTools, StringTools
 
@@ -60,6 +60,6 @@ class SharedCommand(commands.Cog):
 
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(SharedCommand(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(SharedCommand(bot))
 '''

@@ -1,6 +1,6 @@
 import asyncio
 
-from nextcord.ext import commands
+from discord.ext import commands
 from Modules.database_manager import DatabaseManager
 from Modules.command_permissions import moderator
 
@@ -13,6 +13,10 @@ class TextChannelSelection(commands.Cog):
         # "O CANAL DE MUSICA": 1  --WIP, not implemented and im too lazy, someday maybe
         # for now thats it
         }
+    
+    
+    async def cog_load(self):
+        print(f"Cog Loaded: {self.__cog_name__}")
     
     
     @commands.command(name = "selecionarCanal", aliases = ["channelselect", "canallembrar", 'lembra'])
@@ -82,5 +86,5 @@ class TextChannelSelection(commands.Cog):
                 await ctx.reply("meu mano não tem canal selecionado pra isso aqui nesse server")
 
 
-def setup(bot):
-    bot.add_cog(TextChannelSelection(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(TextChannelSelection(bot))

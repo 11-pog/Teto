@@ -1,6 +1,6 @@
-import os, nextcord
+import os, discord
 
-from nextcord.ext import commands
+from discord.ext import commands
 from resources_path import resources_path
 from Modules.command_permissions import is_moderator
 
@@ -8,6 +8,8 @@ class GeneralCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
     
+    async def cog_load(self):
+        print(f"Cog Loaded: {self.__cog_name__}")
     
     @commands.command(name = "repita", aliases = ['repete'])
     async def sendMessage(self, ctx, *, message):
@@ -34,7 +36,7 @@ class GeneralCommands(commands.Cog):
     
     @commands.command(name = "autista")
     async def sendImage(self, ctx):
-        file = nextcord.File(f"{resources_path('image')}/autismo.jpg", filename="autismo.png")
+        file = discord.File(f"{resources_path('image')}/autismo.jpg", filename="autismo.png")
         await ctx.send(file=file)
         await ctx.message.delete()
     
@@ -70,5 +72,5 @@ class GeneralCommands(commands.Cog):
 
 
 
-def setup(bot):
-    bot.add_cog(GeneralCommands(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(GeneralCommands(bot))

@@ -1,6 +1,6 @@
 import asyncio
 
-from nextcord.ext import commands
+from discord.ext import commands
 from Modules.command_permissions import moderator
 
 class MassMessageDeletion(commands.Cog):
@@ -8,6 +8,8 @@ class MassMessageDeletion(commands.Cog):
         self.bot = bot
         self.message_deletion_dict = {}
     
+    async def cog_load(self):
+        print(f"Cog Loaded: {self.__cog_name__}")
     
     # Pra marcar
     @commands.command(name = "toMark", aliases = ["marca"])
@@ -56,5 +58,5 @@ class MassMessageDeletion(commands.Cog):
             self.message_deletion_dict[message.channel.id].append(message)
 
 
-def setup(bot):
-    bot.add_cog(MassMessageDeletion(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(MassMessageDeletion(bot))

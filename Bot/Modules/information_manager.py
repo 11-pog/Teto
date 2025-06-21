@@ -1,11 +1,11 @@
 # bot_utilities.py
 
-import os, nextcord
+import os, discord
 
 class InformationManager:
     """information related functions for the bot.
     """
-    def __init__(self, bot_object: nextcord.Client):
+    def __init__(self, bot_object: discord.Client):
         """
         Args:
             bot_object (nextcord.Client): The nextcord bot object that represents the bot
@@ -13,7 +13,7 @@ class InformationManager:
         self.bot = bot_object
     
     
-    async def fetch_guild_by_name(self, desired_server_name: str) -> nextcord.Guild | None:
+    async def fetch_guild_by_name(self, desired_server_name: str) -> discord.Guild | None:
         """Returns a server object by its name, returns None if no server is found
         
         Args:
@@ -32,7 +32,7 @@ class InformationManager:
         return None
     
     
-    async def fetch_member_by_name(self, member_name: str) -> nextcord.Member | None:
+    async def fetch_member_by_name(self, member_name: str) -> discord.Member | None:
         """Returns a member object by its name, returns None if no member is found
         
         Args:
@@ -54,7 +54,7 @@ class InformationManager:
         return None
     
     
-    async def fetch_member_by_id(self, member_id: int) -> nextcord.Member | None:
+    async def fetch_member_by_id(self, member_id: int) -> discord.Member | None:
         """Returns a member object by its id, returns None if no member is found
         
         Args:

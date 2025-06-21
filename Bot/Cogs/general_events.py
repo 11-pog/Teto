@@ -1,6 +1,6 @@
 import asyncio, signal
 
-from nextcord.ext import commands
+from discord.ext import commands
 from Modules.utils import StringTools, Utils
 from Modules.information_manager import InformationManager
 from Modules.database_manager import DatabaseManager
@@ -11,11 +11,13 @@ class GeneralEvents(commands.Cog):
         self.database = DatabaseManager()
         self.info = InformationManager(self.bot)
     
+    async def cog_load(self):
+        print(f"Cog Loaded: {self.__cog_name__}")
+    
     
     def shutdown_request(self, signal_received, frame):
         self.bot.loop.create_task(DatabaseManager.disconnect_all())
         self.bot.loop.create_task(self.bot.close())
-    
     
     @commands.Cog.listener()
     async def on_message(self, msg):
@@ -60,15 +62,15 @@ class GeneralEvents(commands.Cog):
             
             if greetings_channel:
                 await greetings_channel.send("Boa tarde")
-                print(f"Mensage mandada em: {marked_server.name}")
+                print(f"Message sent to: {marked_server.name}")
             else:
-                print(f'O servidor {marked_server.name} não possue nenhum canal de "boas vindas"')
+                print(f'Guild "{marked_server.name}" does not have a "Welcome" channel')
 
 
-def setup(bot):
+async def setup(bot: commands.Bot):
     cog = GeneralEvents(bot)
     
     signal.signal(signal.SIGTERM, cog.shutdown_request)
     signal.signal(signal.SIGINT, cog.shutdown_request)
     
-    bot.add_cog(cog)
+    await bot.add_cog(cog)

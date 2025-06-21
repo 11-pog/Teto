@@ -2,7 +2,7 @@ import asyncio
 import os
 import random
 
-from nextcord.ext import commands
+from discord.ext import commands
 from unidecode import unidecode
 
 import yt_dlp
@@ -304,5 +304,5 @@ class youtube_playback(commands.Cog):
             self.current_music[before.channel.id] = None
 
 
-def setup(bot):
-    bot.add_cog(youtube_playback(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(youtube_playback(bot))

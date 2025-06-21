@@ -1,9 +1,13 @@
-from nextcord.ext import commands
+from discord.ext import commands
 from Modules.command_manipulation.shared_command_system import SharedCommand
 
 class test(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+    
+    
+    async def cog_load(self):
+        print(f"Cog Loaded: {self.__cog_name__}")
     
     
     @SharedCommand.dispatch(full_name = "elabore o horario atual do dia")
@@ -40,5 +44,5 @@ class test(commands.Cog):
 
 
 
-def setup(bot):
-    bot.add_cog(test(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(test(bot))

@@ -1,6 +1,6 @@
-import nextcord
+import discord
 
-from nextcord.ext import commands
+from discord.ext import commands
 from Modules.command_manipulation.command_extension import command_extension
 from Modules.information_manager import InformationManager
 from Modules.database_manager import DatabaseManager
@@ -12,7 +12,8 @@ class RolePermissionController(commands.Cog):
         self.database = DatabaseManager()
         self.info_manager = InformationManager(self.bot)
     
-    
+    async def cog_load(self):
+        print(f"Cog Loaded: {self.__cog_name__}")
     
     @commands.command(name="permissão")
     @command_extension("de cargo", "pro cargo")
@@ -45,7 +46,7 @@ class RolePermissionController(commands.Cog):
             await ctx.send("Dexa de ser burro")
             return None
         
-        role_object = nextcord.utils.get(ctx.guild.roles, mention=role_mention)
+        role_object = discord.utils.get(ctx.guild.roles, mention=role_mention)
         
         if role_object is None:
             await ctx.send("esse cargo aí não existe não fi")
@@ -64,5 +65,5 @@ class RolePermissionController(commands.Cog):
 
 
 
-def setup(bot):
-    bot.add_cog(RolePermissionController(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(RolePermissionController(bot))

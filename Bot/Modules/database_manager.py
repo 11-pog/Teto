@@ -5,46 +5,30 @@ from typing import Any, Callable, Iterable, List, Mapping, Optional, Set
 from resources_path import resources_path
 
 class DatabaseManager:
-    _instances: Set["DatabaseManager"] = set()
+    database = None
+    cursor = None
+    loop = None
     
-    def __init__(self, auto_connect: bool = True, loop: Optional[asyncio.AbstractEventLoop] = None):
-        if auto_connect and loop:
-            loop.create_task(self.connect())
-        elif auto_connect:
-            asyncio.run(self.connect())
-        
-        self._instances.add(self)
-    
-    def __del__(self):
-        if hasattr(self, "database"):
-            self.loop.run_until_complete(self.database.close())
-        
-        self._instances.discard(self)
-    
-    
-    async def connect(self):
-        self.loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
-        
-        self.database = await aiosqlite.connect(f"{resources_path('database')}/GeneralBotData.db")
-        self.cursor = await self.database.cursor()
-    
-    async def disconnect(self):
-        if hasattr(self, "database"):
-            await self.database.close()
+    def __init__(self):
+        pass
     
     @classmethod
-    async def disconnect_all(cls):
-        for instance in list(cls._instances):
-            await instance.disconnect()
-            instance.database = None
+    async def connect(cls):
+        cls.loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
         
-        cls._instances.clear()
+        cls.database = await aiosqlite.connect(f"{resources_path('database')}/GeneralBotData.db")
+        cls.cursor = await cls.database.cursor()
+    
+    @classmethod
+    def disconnect(cls):
+        if cls.database is not None and cls.loop is not None:
+            cls.loop.create_task(cls.database.close())
     
     @staticmethod
-    async def _requires_connection(func: Callable[..., Any]) -> Callable[..., Any]:
+    def _requires_connection(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
-        async def wrapper(self: DatabaseManager, *args: Any, **kwargs: Any) -> Callable[..., Any]:
-            if not hasattr(self, "database") or not hasattr(self, "cursor"):
+        async def wrapper(self, *args: Any, **kwargs: Any) -> Callable[..., Any]:
+            if DatabaseManager.database is None or DatabaseManager.cursor is None:
                 raise RuntimeError("Database did not initialize!")
             return await func(self, *args, **kwargs)
         return wrapper
@@ -52,7 +36,7 @@ class DatabaseManager:
     
     @_requires_connection
     async def execute(self, query: str, parameters: Optional[Iterable[Any]] = None):
-        return await self.cursor.execute(query, parameters)
+        return await DatabaseManager.cursor.execute(query, parameters)
     
     TableStructure = Mapping[str, str]
     DatabaseStructure = Mapping[str, TableStructure]
@@ -69,28 +53,28 @@ class DatabaseManager:
                 columns += [f"{column} {structure[table][column]}"]
             
             init_query = base_query + table + f'({', '.join(columns)})'
-            await self.database.execute(init_query)
+            await DatabaseManager.database.execute(init_query)
     
     @_requires_connection
     async def fetchall(self, query: str, parameters: Optional[Iterable[Any]] = None):
-        cursor = await self.cursor.execute(query, parameters)
+        cursor = await DatabaseManager.cursor.execute(query, parameters)
         return await cursor.fetchall()
     
     @_requires_connection
     async def fetchone(self, query: str, parameters: Optional[Iterable[Any]] = None):
-        cursor = await self.cursor.execute(query, parameters)
+        cursor = await DatabaseManager.cursor.execute(query, parameters)
         return await cursor.fetchone()
     
     @_requires_connection
     async def fetchmany(self, query: str, parameters: Optional[Iterable[Any]] = None, amount: Optional[int] = None):
-        cursor = await self.cursor.execute(query, parameters)
+        cursor = await DatabaseManager.cursor.execute(query, parameters)
         return await cursor.fetchmany(amount)
     
     @_requires_connection
     async def commit(self, query: str | None = None, parameters: Optional[Iterable[Any]] = None):
         if query is not None:
-            await self.cursor.execute(query, parameters)
-        await self.database.commit()
+            await DatabaseManager.cursor.execute(query, parameters)
+        await DatabaseManager.database.commit()
 
 
 

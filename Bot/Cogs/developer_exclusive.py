@@ -1,11 +1,14 @@
 from typing import Any
-from nextcord.ext import commands
-from nextcord.ext.commands import Context
+from discord.ext import commands
+from discord.ext.commands import Context
 from Modules.command_permissions import developer
 
-class dev_exclusive(commands.Cog):
+class DevOnlyCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+    
+    async def cog_load(self):
+        print(f"Cog Loaded: {self.__cog_name__}")
     
     @commands.command(name = "desliga")
     @developer()
@@ -19,5 +22,5 @@ class dev_exclusive(commands.Cog):
     #    print(ctx.author.id)
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(dev_exclusive(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(DevOnlyCommands(bot))
