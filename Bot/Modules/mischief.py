@@ -102,28 +102,20 @@ class Mischief:
         source = discord.FFmpegPCMAudio(audio_path)
         
         vc_bot_client = self.bot.voice_clients[0]
-        assert isinstance(vc_bot_client, discord.VoiceClient)
         
         await asyncio.sleep(random.randint(1, 10))
         
-        async def stop(err):
+        flag = asyncio.Event()
+        
+        def stop(err):
             if err:
                 print(err)
-            await asyncio.sleep(random.uniform(0, 0.6))  
-            await vc_bot_client.disconnect()
+            flag.set()
         
         vc_bot_client.play(source, after = stop)
         print(f"Mischief: Love me some {audio_name}")
-
-
-def setup(bot):
-    i_am_afraid = Mischief(bot,
-    servers_with_tomfoolery_present= [
-        "Whatsapp 2",
-        "Bot Testing Ground",
-        "VILA DO CHAVES"
-        ],
-    chance_denominator=100,
-    interval_in_seconds = 10
-    )
-    bot.add_cog(i_am_afraid)
+        
+        await flag.wait()
+        
+        await asyncio.sleep(random.uniform(0, 0.6))  
+        await vc_bot_client.disconnect()
