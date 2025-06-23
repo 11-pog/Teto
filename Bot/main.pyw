@@ -15,8 +15,6 @@ if lock is None:
 
 
 # Main package import
-import discord
-
 from discord import Intents
 from bot import BotClient
 
@@ -35,15 +33,6 @@ bot = BotClient(command_prefix=['aproveita e '], intents=intents, help_command= 
 
 has_terminal = Utils.has_terminal()
 bot.set_error_output_as_dev(not has_terminal)
-
-@bot.event
-async def on_message(msg: discord.Message):
-    if msg.content.startswith(tuple(await bot.get_prefix(msg))) and await is_user_role_tagged(await bot.get_context(msg), 'forbid_BOT'):
-        print(f'Blacklisted user "{msg.author.name}" tried using bot in {msg.guild.name}, {msg.channel.name}')
-        return
-    
-    await bot.process_commands(msg)
-
 
 if __name__ == '__main__':
     bot.run(os.environ['AUTISM_DISCORD_TOKEN'])

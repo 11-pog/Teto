@@ -5,6 +5,7 @@ import discord
 from discord.ext.commands import Bot, Context
 from discord import app_commands
 
+from Bot.Modules.command_permissions import is_user_role_tagged
 from Modules.information_manager import InformationManager
 from Modules.database_manager import DatabaseManager
 
@@ -84,3 +85,10 @@ class BotClient(Bot):
         embed.timestamp = context.message.created_at
         
         await self.dev_user.send(embed=embed)
+    
+    async def on_message(self, message):
+        if message.content.startswith(tuple(await self.get_prefix(message))) and await is_user_role_tagged(await self.get_context(message), 'forbid_BOT'):
+            print(f'Blacklisted user "{message.author.name}" tried using bot in {message.guild.name}, {message.channel.name}')
+            return
+    
+        await self.process_commands(message)
