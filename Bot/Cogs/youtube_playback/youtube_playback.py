@@ -3,6 +3,7 @@ import os
 import random
 
 from discord.ext import commands
+from discord.ext.commands import Bot, Context
 from unidecode import unidecode
 
 import yt_dlp
@@ -14,7 +15,7 @@ from Cogs.youtube_playback.YTDLSource import YTDLSource
 from Modules.command_permissions import role_blacklisted
 
 class youtube_playback(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
         
         self.music_queue = {}
@@ -80,19 +81,20 @@ class youtube_playback(commands.Cog):
     
     @commands.command("play", aliases = ["toca"])
     @role_blacklisted('forbid_audio_playback', 'forbid_youtube_playback', rejection_message= "Tu tá BANIDO de musicar")
-    async def extract_command_parameters(self, ctx, *, query):
-        command_list = query.split()
+    async def extract_command_parameters(self, ctx: Context, *, query: str):
         voice_client = ctx.voice_client
+        if not voice_client:
+            await ctx.reply("Não to em nenhuma call cabeçudo")
+            await ctx.author.send('"aproveita e entra ai" é o comando pra entrar em call')
+            return
+        
+        command_list = query.split()
         
         is_shuffle = await self.is_shuffle(command_list) if len(command_list) > 1 else False
         url = command_list[0]
         
-        if voice_client:
-            await ctx.reply("Belezura, calma ae")
-            await self.handle_request(ctx, url, is_shuffle)
-        else:
-            await ctx.reply("Não to em nenhuma call cabeçudo")
-            await ctx.author.send('"aproveita e entra ai" é o comando pra entrar em call')
+        await ctx.reply("Belezura, calma ae")
+        await self.handle_request(ctx, url, is_shuffle)
     
     
     async def handle_request(self, ctx, url, is_shuffle):

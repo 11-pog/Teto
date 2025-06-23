@@ -54,26 +54,6 @@ class InformationManager:
         return None
     
     
-    async def fetch_member_by_id(self, member_id: int) -> discord.Member | None:
-        """Returns a member object by its id, returns None if no member is found
-        
-        Args:
-            member_id (int): the member id to search for
-        
-        Returns:
-            Member: the member object if found
-            None: if no member is found
-        """
-        servers = self.bot.guilds
-        
-        for server in servers:
-            member = await server.fetch_member(member_id)
-            if member:
-                return member
-            
-        return None
-    
-    
     async def get_bot_dev(self):
-        bot_developer_id = int(os.environ['MINE_DISCORD_ID'])
-        return await self.fetch_member_by_id(bot_developer_id)
+        bot_developer_id = int(os.environ['BOT_DEV_DISCORD_ID'])
+        return await self.bot.fetch_user(bot_developer_id)

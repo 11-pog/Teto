@@ -15,7 +15,7 @@ class Utils:
             return None
     
     @staticmethod
-    async def has_terminal():
+    def has_terminal():
         return sys.stdout is not None
     
     @staticmethod

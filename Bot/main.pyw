@@ -20,7 +20,6 @@ import discord
 from discord import Intents
 from bot import BotClient
 
-
 # Module import
 from Modules.database_manager import DatabaseManager
 from Modules.command_permissions import is_user_role_tagged
@@ -34,6 +33,8 @@ intents.members = True
 
 bot = BotClient(command_prefix=['aproveita e '], intents=intents, help_command= None, case_insensitive=True)
 
+has_terminal = Utils.has_terminal()
+bot.set_error_output_as_dev(not has_terminal)
 
 @bot.event
 async def on_message(msg: discord.Message):

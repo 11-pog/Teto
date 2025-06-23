@@ -64,7 +64,7 @@ class Mischief:
     
     
     async def on_error(self, error: Exception):
-        if await Utils.has_terminal():
+        if Utils.has_terminal():
             raise error
         
         dev = await self.info.get_bot_dev()
