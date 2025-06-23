@@ -18,10 +18,6 @@ if lock is None:
 from discord import Intents
 from bot import BotClient
 
-# Module import
-from Modules.database_manager import DatabaseManager
-from Modules.command_permissions import is_user_role_tagged
-
 
 #Bot Instantiation
 intents = Intents.default()
@@ -29,10 +25,15 @@ intents = Intents.default()
 intents.message_content = True
 intents.members = True
 
-bot = BotClient(command_prefix=['aproveita e '], intents=intents, help_command= None, case_insensitive=True)
 
 has_terminal = Utils.has_terminal()
-bot.set_error_output_as_dev(not has_terminal)
+bot = BotClient(
+    command_prefix=['aproveita e '], 
+    intents=intents,
+    send_errors_to_developer_dm= not has_terminal,
+    help_command= None, 
+    case_insensitive=True)
+
 
 if __name__ == '__main__':
     bot.run(os.environ['AUTISM_DISCORD_TOKEN'])

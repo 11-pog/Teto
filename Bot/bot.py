@@ -1,27 +1,24 @@
 import traceback
-from typing import Any
+from typing import Any, Tuple
 
 import discord
 from discord.ext.commands import Bot, Context
-from discord import app_commands
+from discord import Message, app_commands
 
-from Bot.Modules.command_permissions import is_user_role_tagged
+from Modules.command_permissions import is_user_role_tagged
 from Modules.information_manager import InformationManager
 from Modules.database_manager import DatabaseManager
 
 class BotClient(Bot):
-    def __init__(self, command_prefix, *, help_command = ..., tree_cls = app_commands.CommandTree, description = None, allowed_contexts = ..., allowed_installs = ..., intents, **options):
+    def __init__(self, command_prefix, *, send_errors_to_developer_dm = False, help_command = ..., tree_cls = app_commands.CommandTree, description = None, allowed_contexts = ..., allowed_installs = ..., intents, **options):
         super().__init__(command_prefix, help_command=help_command, tree_cls=tree_cls, description=description, allowed_contexts=allowed_contexts, allowed_installs=allowed_installs, intents=intents, **options)
         
         self.info_manager = InformationManager(self)
         
         self.dev_user = None
-        self.dev_dm_as_err_output = False
+        self.send_errors_to_developer_dm = send_errors_to_developer_dm
     
-    def set_error_output_as_dev(self, state: bool):
-        self.dev_dm_as_err_output = True
-    
-    async def load_extensions(self, *names, package: Any = None):
+    async def load_extensions(self, *names: Tuple[str], package: Any = None):
         for name in names:
             await self.load_extension(name, package=package)
     
@@ -56,7 +53,7 @@ class BotClient(Bot):
     
     
     async def on_command_error(self, context: Context, exception: Exception):
-        if self.dev_dm_as_err_output:
+        if self.send_errors_to_developer_dm:
             await self._report_error_dm(context, exception)
         
         return await super().on_command_error(context, exception)
@@ -86,9 +83,10 @@ class BotClient(Bot):
         
         await self.dev_user.send(embed=embed)
     
-    async def on_message(self, message):
+    
+    async def on_message(self, message: Message):
         if message.content.startswith(tuple(await self.get_prefix(message))) and await is_user_role_tagged(await self.get_context(message), 'forbid_BOT'):
             print(f'Blacklisted user "{message.author.name}" tried using bot in {message.guild.name}, {message.channel.name}')
             return
-    
+        
         await self.process_commands(message)

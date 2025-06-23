@@ -113,7 +113,7 @@ def developer(rejection_message: str = None):
     return _generic_decorator(is_bot_developer, rejection_message=rejection_message)
 
 
-def role_blacklisted(*category, rejection_message: str = None):
+def role_blacklisted(*category: str, rejection_message: str = None):
     return _generic_decorator(
         is_user_role_tagged,
         *category,
@@ -121,7 +121,7 @@ def role_blacklisted(*category, rejection_message: str = None):
         invert = True
     )
 
-def role_whitelisted(*category, rejection_message: str = None):
+def role_whitelisted(*category: str, rejection_message: str = None):
     return _generic_decorator(
         is_user_role_tagged,
         *category,
