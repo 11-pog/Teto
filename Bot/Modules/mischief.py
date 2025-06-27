@@ -1,7 +1,7 @@
 # mischief.py
 
 import json
-import os, random, discord, asyncio
+import os, random, discord, asyncio, resources_path
 from typing import List
 
 from discord.ext.commands import Bot
@@ -10,7 +10,6 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from utils import Utils
 from information_manager import InformationManager
-from resources_path import resources_path
 
 class Mischief:
     """A considerably small amount of mischief will be caused.
@@ -19,8 +18,8 @@ class Mischief:
         self.bot = bot
         self.info = InformationManager(self.bot)
         
-        self.regular_audio_path: str = os.join(resources_path('audio'), "Regular")
-        self.rare_audio_path: str = os.join(resources_path('audio'), "Rare")
+        self.regular_audio_path: str = os.join(resources_path.AUDIOS, "Regular")
+        self.rare_audio_path: str = os.join(resources_path.AUDIOS, "Rare")
         self.rare_json_path: str = os.join(self.rare_audio_path, "rare_chance.json")
         
         self.servers_with_tomfoolery_present = servers_with_tomfoolery_present
@@ -98,12 +97,19 @@ class Mischief:
     async def get_rare_audio(self):
         pass
     
+    async def get_regular_audio(self):
+        selected_audio: str = random.choice(self.regular_audios)
+        audio_path: str = os.path.join(self.regular_audio_path, selected_audio)
+        
+        return audio_path, selected_audio
+    
     async def get_random_audio(self):
         if random.uniform(0, 100) <= self.chances["rare_chance"]:
-            selected_audio: str = await self.get_rare_audio()
+            audio_path, selected_audio = await self.get_rare_audio()
         else:
-            selected_audio: str = random.choice(self.regular_audios)
-        return os.path.join(resources_path('audio'), selected_audio), selected_audio
+            audio_path, selected_audio = await self.get_regular_audio()
+        
+        return audio_path, selected_audio
     
     
     async def perform_a_minuscule_amount_of_despicable_actions(self):

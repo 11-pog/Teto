@@ -1,6 +1,5 @@
-import asyncio
-import os
-import random
+import asyncio, os, random, yt_dlp, resources_path
+
 from typing import Dict, List
 
 from discord import Member, VoiceClient
@@ -8,10 +7,7 @@ from discord.ext import commands
 from discord.ext.commands import Bot, Context
 from unidecode import unidecode
 
-import yt_dlp
-
 from Modules.command_manipulation.command_extension import command_extension
-from resources_path import resources_path
 from Modules.cache import JsonCache
 from Cogs.youtube_playback.YTDLSource import YTDLSource
 from Cogs.youtube_playback.YTUtils import YTUtils
@@ -24,7 +20,7 @@ class youtube_playback(commands.Cog):
         self.music_queue: Dict[int, List[str]] = {}
         self.current_music: Dict[int, str] = {}
         
-        cache_file_path = os.path.join(resources_path('cache'), 'yt-playback_info_cache.json')
+        cache_file_path = os.path.join(resources_path.CACHE, 'yt-playback_info_cache.json')
         self.info_cache = JsonCache(cache_file_path, size_limit=50000)
     
     async def _initialize_dicts(self, ctx: Context):

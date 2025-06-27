@@ -1,8 +1,6 @@
-import asyncio, aiosqlite
+import asyncio, aiosqlite, resources_path
 from functools import wraps
 from typing import Any, Callable, Iterable, List, Mapping, Optional, Set
-
-from resources_path import resources_path
 
 class DatabaseManager:
     database = None
@@ -13,7 +11,7 @@ class DatabaseManager:
     
     @classmethod
     async def connect(cls):
-        cls.database = await aiosqlite.connect(f"{resources_path('database')}/GeneralBotData.db")
+        cls.database = await aiosqlite.connect(f"{resources_path.DATABASES}/GeneralBotData.db")
         cls.cursor = await cls.database.cursor()
     
     @classmethod

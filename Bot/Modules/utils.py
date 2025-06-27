@@ -1,9 +1,8 @@
-import os, sys
+import os, sys, resources_path
 from typing import Any, Callable, Iterable, List, Optional, Sized, TypeVar
 import zc.lockfile # type: ignore
 
 from unidecode import unidecode
-from resources_path import resources_path
 
 class Utils:
     @staticmethod
@@ -20,7 +19,7 @@ class Utils:
     
     @staticmethod
     async def get_the_forbidden_list() -> List[str]:
-        path = os.path.join(resources_path('text'), 'the_big_forbidden_list_of_bad_words.txt')
+        path = os.path.join(resources_path.TEXTS, 'the_big_forbidden_list_of_bad_words.txt')
         with open(path, 'r') as file:
             forbidden_list = file.read().split(',')
             forbidden_list = IterTools.for_each_item(forbidden_list, StringTools.clean)

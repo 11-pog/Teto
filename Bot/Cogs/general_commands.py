@@ -1,7 +1,6 @@
-import os, discord
+import os, discord, resources_path
 
 from discord.ext import commands
-from resources_path import resources_path
 from Modules.command_permissions import is_moderator
 
 class GeneralCommands(commands.Cog):
@@ -36,7 +35,7 @@ class GeneralCommands(commands.Cog):
     
     @commands.command(name = "autista")
     async def sendImage(self, ctx):
-        file = discord.File(f"{resources_path('image')}/autismo.jpg", filename="autismo.png")
+        file = discord.File(f"{resources_path.IMAGES}/autismo.jpg", filename="autismo.png")
         await ctx.send(file=file)
         await ctx.message.delete()
     
@@ -44,7 +43,7 @@ class GeneralCommands(commands.Cog):
     # Comando de Ajuda
     @commands.command(name = "ayuda", aliases = ['ajuda', 'helpa', 'help'])
     async def test(self, ctx, *, args = None):
-        help_text_file_path = os.path.join(resources_path('text'), "Help_message.txt")
+        help_text_file_path = os.path.join(resources_path.TEXTS, "Help_message.txt")
         is_mod = await is_moderator(ctx)
         only_mod = args is not None and 'só mod' in args.lower()
         

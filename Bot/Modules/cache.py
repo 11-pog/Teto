@@ -1,9 +1,10 @@
+from io import TextIOWrapper
 import asyncio, os, warnings, time, json
 
-from typing import Callable, List, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 class QuickCache:
-    def __init__(self, filter_keys: Tuple[str, ...] | None = None, max_cache_size: int = None):
+    def __init__(self, filter_keys: Tuple[str, Any] | None = None, max_cache_size: int = None):
         # Initialize the cache manager with optional filter keys
         self.filter_keys = filter_keys
         self.max_size = max_cache_size
@@ -11,14 +12,14 @@ class QuickCache:
         self.are_filter_keys_enabled = self.filter_keys is not None
         self.is_size_capped = self.max_size is not None and self.max_size != 0
         
-        self.cache = {}
+        self.cache: Dict[Any, Any] = {}
     
     
-    async def _get_filter_index(self, number):
+    async def _get_filter_index(self, number: int):
         # Retrieve the index of the filter key
         return self.filter_keys[number]
     
-    async def _set_filter_parameters(self, key, result_from_callback):
+    async def _set_filter_parameters(self, key: Any, result_from_callback):
         # Set the filter parameters for the specified key in the cache
         if not self.are_filter_keys_enabled:
             return
@@ -140,7 +141,7 @@ class QuickCache:
 
 
 class JsonCache:
-    def __init__(self, cache_file_path: str, size_limit = None):
+    def __init__(self, cache_file_path: str, size_limit: Optional[int] = None):
         self.cache_file_path = cache_file_path
         
         self.cache_keys = {}
@@ -161,7 +162,7 @@ class JsonCache:
         
         return cache
     
-    def _dump(self, cache, file):
+    def _dump(self, cache: Dict, file: TextIOWrapper):
         file.seek(0)
         json.dump(cache, file)
         file.truncate()

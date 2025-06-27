@@ -1,0 +1,1 @@
+Location of bot config in JSON format

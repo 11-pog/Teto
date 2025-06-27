@@ -1,6 +1,7 @@
 from discord.ext import commands
 from discord.ext.commands import Context
 
+from Modules.settings import Settings
 from Modules.mischief import Mischief
 from Modules.database_manager import DatabaseManager
 from Modules.command_permissions import Permission, developer
@@ -11,6 +12,8 @@ class startup(commands.Cog):
     
     
     async def _object_startup(self):
+        Settings.create_settings()
+        
         self.fnuuy = Mischief(
             self.bot,
             servers_with_tomfoolery_present= [

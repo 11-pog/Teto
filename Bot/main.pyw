@@ -1,11 +1,10 @@
 # main.py
 
-import os, time
+import os, time, resources_path
 
 from Modules.utils import Utils
-from resources_path import resources_path
 
-NAME = os.path.join(resources_path('lock'), 'AutismBOT_LOCK')
+NAME = os.path.join(resources_path.LOCK, 'AutismBOT_LOCK')
 lock = Utils.is_duplicate(NAME)
 
 if lock is None:
