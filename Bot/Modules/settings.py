@@ -3,15 +3,27 @@ from discord import Enum
 
 
 class SettingType(Enum):
-    BOT = 0
-    MISCHIEF = 1
+    DEBUG = 0
+    BOT = 1
+    MISCHIEF = 2
 
 SETTINGS_PATH = resources_path.SETTINGS
 
 
-class Settings:
+class Settings(dict):
     def __init__(self, setting_type: SettingType):
         self.setting_type = setting_type
+        self.path = self.get_path()
+        
+        if not os.path.exists(self.path):
+            Settings.create_settings()
+        
+        super().__init__()
+    
+    
+    def get_path(self) -> str:
+        filename = f"{self.setting_type.name.lower()}.json"
+        return os.path.join(SETTINGS_PATH, filename)
     
     
     @staticmethod

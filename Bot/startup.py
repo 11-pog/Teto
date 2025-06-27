@@ -1,6 +1,8 @@
 from discord.ext import commands
 from discord.ext.commands import Context
 
+from Modules.Logging import logger
+from Modules.Logging.bot_logging import DiscordLogger
 from Modules.settings import Settings
 from Modules.mischief import Mischief
 from Modules.database_manager import DatabaseManager
@@ -10,8 +12,8 @@ class startup(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
     
-    
     async def _object_startup(self):
+        logger.set_bot(self.bot)
         Settings.create_settings()
         
         self.fnuuy = Mischief(

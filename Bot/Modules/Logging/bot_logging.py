@@ -1,57 +1,69 @@
 import asyncio
+from discord import Enum, User
 from discord.ext.commands import Bot
 
-#from ..information_manager import InformationManager
+from Modules.information_manager import InformationManager
 from formatter import DiscordStyleFormatter
-#from Modules.utils import Utils
+from Modules.utils import Utils
 
 import logging
 
 
-class Logging:
+class DiscordLogger(logging.Logger):
     _bot: Bot = None
-    _logger: logging.Logger = None
-    _has_terminal = True#Utils.has_terminal()
-    #_info: InformationManager = None
     
-    @classmethod
-    def setup(cls, logger_name: str | None = None):
-        cls._logger = logging.getLogger(logger_name)
-        
-        handler = logging.StreamHandler()
-        formatter = DiscordStyleFormatter(datefmt='%Y-%m-%d %H:%M:%S')
-        handler.setFormatter(formatter)
-        
-        # Bind the spell to the logger
-        cls._logger.addHandler(handler)
-        cls._logger.setLevel(logging.DEBUG)
+    _has_terminal = Utils.has_terminal()
+    _bot_dev: User = None
+    
+    def __init__(self, name, level = 0, fallback_level = 0):
+        self.fallback_level = fallback_level
+        super().__init__(name, level)
     
     
     @classmethod
-    def set_bot(cls, bot: Bot):
+    async def set_bot(cls, bot: Bot):
         cls._bot = bot
-        #cls._info = InformationManager(bot)
+        info = InformationManager(bot)
+        cls._bot_dev = await info.get_bot_dev()
     
     
-    @staticmethod
-    async def log(message: str, dev_fallback: 
-        bool = True, level: int = logging.INFO):
-        if Logging._logger is None:
-            print("No logger present")
-            return
-        if Logging._has_terminal:
-            Logging._logger.log(level, message)
-        #if dev_fallback and Logging._info is not None:
-        #    dev = await Logging._info.get_bot_dev()
-        #   await dev.send(message)
+    def isFallbackEnabledFor(self, level: int):
+        return level >= self.fallback_level
+    
+    def log(self, level, msg, dev_fallback: bool | None = None, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
+        if DiscordLogger._has_terminal:
+            return super().log(level, msg, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
+        
+        if dev_fallback is None:
+            dev_fallback = self.isFallbackEnabledFor(level)
+        
+        if dev_fallback and DiscordLogger._bot_dev is not None and DiscordLogger._bot is not None:
+            DiscordLogger._bot.loop.create_task(DiscordLogger._bot_dev.send(msg))
+    
+    
+    def info(self, msg, dev_fallback: bool, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
+        return self.log(logging.INFO, msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
+    
+    def warning(self, msg, dev_fallback: bool, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
+        return self.log(logging.WARNING, msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
+    
+    def debug(self, msg, dev_fallback: bool, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
+        return self.log(logging.DEBUG, msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
+    
+    def error(self, msg, dev_fallback: bool, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
+        return self.log(logging.ERROR, msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
+    
+    def critical(self, msg, dev_fallback: bool, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
+        return self.log(logging.CRITICAL, msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
 
-    
 
+#_logger = DiscordLogger("AutismBOT")
+    
 
 if __name__ == "__main__":
-    Logging.setup("AutismBOT")
-    asyncio.run(Logging.log("Teste bizonho", level=logging.INFO))
-    asyncio.run(Logging.log("Teste bizonho", level=logging.ERROR))
-    asyncio.run(Logging.log("Teste bizonho", level=logging.DEBUG))
-    asyncio.run(Logging.log("Teste bizonho", level=logging.WARNING))
-    asyncio.run(Logging.log("Teste bizonho", level=logging.CRITICAL))
+    DiscordLogger.setup("AutismBOT")
+    DiscordLogger.log("Teste bizonho", level=logging.INFO)
+    DiscordLogger.log("Teste bizonho", level=logging.ERROR)
+    DiscordLogger.log("Teste bizonho", level=logging.DEBUG)
+    DiscordLogger.log("Teste bizonho", level=logging.WARNING)
+    DiscordLogger.log("Teste bizonho", level=logging.CRITICAL)

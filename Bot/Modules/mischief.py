@@ -1,6 +1,7 @@
 # mischief.py
 
 import json
+from Modules.Logging.bot_logging import DiscordLogger
 import os, random, discord, asyncio, resources_path
 from typing import List
 
@@ -14,7 +15,7 @@ from information_manager import InformationManager
 class Mischief:
     """A considerably small amount of mischief will be caused.
     """
-    def __init__(self, bot: discord.Client, *, servers_with_tomfoolery_present: list[str], chance_denominator: int = 100, interval_in_seconds: int = 10):
+    def __init__(self, bot: Bot, *, servers_with_tomfoolery_present: list[str], chance_denominator: int = 100, interval_in_seconds: int = 10):
         self.bot = bot
         self.info = InformationManager(self.bot)
         
@@ -33,7 +34,7 @@ class Mischief:
     async def commence_moderate_mischief(self):
         """STARTS THE FUN
         """
-        print('Mischief: Initialized the funny lmao xdxd')
+        DiscordLogger.debug('Mischief: Initialized the funny lmao xdxd', dev_fallback=False)
         await self.setup()
         
         self.scheduler_jobs_dict['theTrollingJob'] = self.scheduler.add_job(self.mischief_interface, 'interval', seconds = self.interval)
@@ -61,8 +62,6 @@ class Mischief:
     
     async def QUIT_HAVING_FUN(self):
         """ends the fun D:"""
-        print('it ends')
-        
         self.scheduler.remove_all_jobs()
     
     
@@ -84,7 +83,7 @@ class Mischief:
             await dev.send(f'Error in MISCHIEF:\n{error}')
     
     
-    async def get_populated_vcs(self):
+    async def get_populated_vcs(self) -> List[discord.VoiceChannel]:
         voice_channels = []
         
         for guild in self.guilds:
@@ -103,13 +102,14 @@ class Mischief:
         
         return audio_path, selected_audio
     
+    
     async def get_random_audio(self):
         if random.uniform(0, 100) <= self.chances["rare_chance"]:
-            audio_path, selected_audio = await self.get_rare_audio()
+            audio_path, name = await self.get_rare_audio()
         else:
-            audio_path, selected_audio = await self.get_regular_audio()
+            audio_path, name = await self.get_regular_audio()
         
-        return audio_path, selected_audio
+        return audio_path, name
     
     
     async def perform_a_minuscule_amount_of_despicable_actions(self):
