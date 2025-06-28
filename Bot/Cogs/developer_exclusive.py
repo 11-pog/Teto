@@ -2,13 +2,14 @@ from typing import Any
 from discord.ext import commands
 from discord.ext.commands import Context
 from Modules.command_permissions import developer
+from Modules.Logging.logger import logger
 
 class DevOnlyCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
     
     async def cog_load(self):
-        print(f"Cog Loaded: {self.__cog_name__}")
+        logger.info(f"Cog Loaded: {self.__cog_name__}")
     
     @commands.command(name = "desliga")
     @developer()

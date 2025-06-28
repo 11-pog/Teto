@@ -1,6 +1,6 @@
 import logging
 from Modules.Logging.formatter import DiscordStyleFormatter
-from bot_logging import DiscordLogger
+from Modules.Logging.discord_logger import DiscordLogger
 
 
 logger = DiscordLogger("AutismBOT", logging.INFO, logging.ERROR)

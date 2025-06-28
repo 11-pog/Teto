@@ -1,5 +1,6 @@
 from discord.ext import commands
 from Modules.command_manipulation.shared_command_system import SharedCommand
+from Modules.Logging.logger import logger
 
 class test(commands.Cog):
     def __init__(self, bot):
@@ -7,7 +8,7 @@ class test(commands.Cog):
     
     
     async def cog_load(self):
-        print(f"Cog Loaded: {self.__cog_name__}")
+        logger.info(f"Cog Loaded: {self.__cog_name__}")
     
     
     @SharedCommand.dispatch(full_name = "elabore o horario atual do dia")

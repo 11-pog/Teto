@@ -2,6 +2,7 @@ import asyncio
 
 from discord.ext import commands
 from Modules.command_permissions import moderator
+from Modules.Logging.logger import logger
 
 class MassMessageDeletion(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -9,7 +10,7 @@ class MassMessageDeletion(commands.Cog):
         self.message_deletion_dict = {}
     
     async def cog_load(self):
-        print(f"Cog Loaded: {self.__cog_name__}")
+        logger.info(f"Cog Loaded: {self.__cog_name__}")
     
     # Pra marcar
     @commands.command(name = "toMark", aliases = ["marca"])

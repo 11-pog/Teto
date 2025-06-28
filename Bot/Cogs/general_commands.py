@@ -2,13 +2,14 @@ import os, discord, resources_path
 
 from discord.ext import commands
 from Modules.command_permissions import is_moderator
+from Modules.Logging.logger import logger
 
 class GeneralCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
     
     async def cog_load(self):
-        print(f"Cog Loaded: {self.__cog_name__}")
+        logger.info(f"Cog Loaded: {self.__cog_name__}")
     
     @commands.command(name = "repita", aliases = ['repete'])
     async def sendMessage(self, ctx, *, message):

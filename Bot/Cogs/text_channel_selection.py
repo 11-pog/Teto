@@ -3,6 +3,7 @@ import asyncio
 from discord.ext import commands
 from Modules.database_manager import DatabaseManager
 from Modules.command_permissions import moderator
+from Modules.Logging.logger import logger
 
 class TextChannelSelection(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -16,7 +17,7 @@ class TextChannelSelection(commands.Cog):
     
     
     async def cog_load(self):
-        print(f"Cog Loaded: {self.__cog_name__}")
+        logger.info(f"Cog Loaded: {self.__cog_name__}")
     
     
     @commands.command(name = "selecionarCanal", aliases = ["channelselect", "canallembrar", 'lembra'])

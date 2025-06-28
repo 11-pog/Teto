@@ -5,6 +5,7 @@ import discord
 from discord.ext.commands import Bot, Context
 from discord import Message, app_commands
 
+from Modules.Logging.logger import logger
 from Modules.command_permissions import is_user_role_tagged
 from Modules.information_manager import InformationManager
 from Modules.database_manager import DatabaseManager
@@ -44,11 +45,11 @@ class BotClient(Bot):
     
     
     async def close(self):
-        print("Disconnecting Database...")
+        logger.info("Disconnecting Database...")
         await DatabaseManager.disconnect()
-        print("Database Disconnected")
+        logger.info("Database Disconnected")
         
-        print("Shutting down...")
+        logger.info("Shutting down...")
         return await super().close()
     
     
@@ -86,7 +87,7 @@ class BotClient(Bot):
     
     async def on_message(self, message: Message):
         if message.content.startswith(tuple(await self.get_prefix(message))) and await is_user_role_tagged(await self.get_context(message), 'forbid_BOT'):
-            print(f'Blacklisted user "{message.author.name}" tried using bot in {message.guild.name}, {message.channel.name}')
+            logger.info(f'Blacklisted user "{message.author.name}" tried using bot in {message.guild.name}, {message.channel.name}')
             return
         
         await self.process_commands(message)

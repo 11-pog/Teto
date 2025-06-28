@@ -7,6 +7,7 @@ from discord.ext import commands
 from discord.ext.commands import Bot, Context
 from unidecode import unidecode
 
+from Modules.Logging.logger import logger
 from Modules.command_manipulation.command_extension import command_extension
 from Modules.cache import JsonCache
 from Cogs.youtube_playback.YTDLSource import YTDLSource
@@ -22,6 +23,9 @@ class youtube_playback(commands.Cog):
         
         cache_file_path = os.path.join(resources_path.CACHE, 'yt-playback_info_cache.json')
         self.info_cache = JsonCache(cache_file_path, size_limit=50000)
+    
+    async def cog_load(self):
+        logger.info(f"Cog Loaded: {self.__cog_name__}")
     
     async def _initialize_dicts(self, ctx: Context):
         voice_channel_id = await YTUtils.get_voice_channel_id(ctx.voice_client)

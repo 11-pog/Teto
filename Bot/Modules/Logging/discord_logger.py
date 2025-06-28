@@ -1,9 +1,7 @@
-import asyncio
-from discord import Enum, User
+from discord import User
 from discord.ext.commands import Bot
 
 from Modules.information_manager import InformationManager
-from formatter import DiscordStyleFormatter
 from Modules.utils import Utils
 
 import logging
@@ -41,24 +39,21 @@ class DiscordLogger(logging.Logger):
             DiscordLogger._bot.loop.create_task(DiscordLogger._bot_dev.send(msg))
     
     
-    def info(self, msg, dev_fallback: bool, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
+    def info(self, msg, dev_fallback: bool | None = None, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
         return self.log(logging.INFO, msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
     
-    def warning(self, msg, dev_fallback: bool, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
+    def warning(self, msg, dev_fallback: bool | None = None, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
         return self.log(logging.WARNING, msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
     
-    def debug(self, msg, dev_fallback: bool, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
+    def debug(self, msg, dev_fallback: bool | None = None, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
         return self.log(logging.DEBUG, msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
     
-    def error(self, msg, dev_fallback: bool, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
+    def error(self, msg, dev_fallback: bool | None = None, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
         return self.log(logging.ERROR, msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
     
-    def critical(self, msg, dev_fallback: bool, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
+    def critical(self, msg, dev_fallback: bool | None = None, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
         return self.log(logging.CRITICAL, msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
 
-
-#_logger = DiscordLogger("AutismBOT")
-    
 
 if __name__ == "__main__":
     DiscordLogger.setup("AutismBOT")

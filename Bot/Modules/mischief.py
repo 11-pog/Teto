@@ -1,7 +1,8 @@
 # mischief.py
 
 import json
-from Modules.Logging.bot_logging import DiscordLogger
+from Modules.settings import Settings
+from Modules.Logging.logger import logger
 import os, random, discord, asyncio, resources_path
 from typing import List
 
@@ -9,23 +10,40 @@ from discord.ext.commands import Bot
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from utils import Utils
-from information_manager import InformationManager
+from Modules.utils import Utils
+from Modules.information_manager import InformationManager
+
+
+REGULAR_AUDIO_PATH: str = os.path.join(resources_path.AUDIOS, "Regular")
+RARE_AUDIO_PATH: str = os.path.join(resources_path.AUDIOS, "Rare")
+JSON_CHANCE_PATH: str = os.path.join(RARE_AUDIO_PATH, "rare_chances.json")
+
 
 class Mischief:
     """A considerably small amount of mischief will be caused.
     """
-    def __init__(self, bot: Bot, *, servers_with_tomfoolery_present: list[str], chance_denominator: int = 100, interval_in_seconds: int = 10):
+    def __init__(self, bot: Bot):
         self.bot = bot
-        self.info = InformationManager(self.bot)
+        self.info_manager = InformationManager(self.bot)
         
-        self.regular_audio_path: str = os.join(resources_path.AUDIOS, "Regular")
-        self.rare_audio_path: str = os.join(resources_path.AUDIOS, "Rare")
-        self.rare_json_path: str = os.join(self.rare_audio_path, "rare_chance.json")
+        self.settings = Settings("mischief")
+        self.settings.setup(default_structure=
+            {
+                "guilds":
+                    [
+                        "Whatsapp 2",
+                        "Bot Testing Ground",
+                        "VILA DO CHAVES"
+                    ],
+                "chance_percentage": 1,
+                "interval_seconds": 10
+            }
+        )
         
-        self.servers_with_tomfoolery_present = servers_with_tomfoolery_present
-        self.chance_denominator = chance_denominator
-        self.interval = interval_in_seconds
+        if not os.path.exists(JSON_CHANCE_PATH):
+            Mischief.create_chance_dict()
+        
+        self.interval: int = self.settings["interval_seconds"]
         
         self.scheduler_jobs_dict = {}
         self.scheduler = AsyncIOScheduler()
@@ -34,7 +52,7 @@ class Mischief:
     async def commence_moderate_mischief(self):
         """STARTS THE FUN
         """
-        DiscordLogger.debug('Mischief: Initialized the funny lmao xdxd', dev_fallback=False)
+        logger.info('Mischief: Initialized the funny lmao xdxd')
         await self.setup()
         
         self.scheduler_jobs_dict['theTrollingJob'] = self.scheduler.add_job(self.mischief_interface, 'interval', seconds = self.interval)
@@ -42,22 +60,34 @@ class Mischief:
     
     
     async def setup(self):
-        servers: List[discord.Guild] = []
+        guilds: List[discord.Guild] = []
         
-        for guild in self.servers_with_tomfoolery_present:
-            found_server = await self.info.fetch_guild_by_name(guild)
+        for guild in self.settings["guilds"]:
+            found_server = await self.info_manager.fetch_guild_by_name(guild)
             
             if found_server is not None:
-                servers.append(found_server)
-                
-        self.guilds = servers
+                guilds.append(found_server)
         
-        self.regular_audios = os.listdir(self.regular_audio_path)
-        self.rare_audios = [path for path in os.listdir(self.rare_audio_path) if not path.endswith(".json")]
+        self.guilds = guilds
         
-        with open(self.rare_json_path, '') as f:
+        self.regular_audios = os.listdir(REGULAR_AUDIO_PATH)
+        self.rare_audios = [path for path in os.listdir(RARE_AUDIO_PATH) if not path.endswith(".json")]
+        
+        with open(JSON_CHANCE_PATH, 'r') as f:
             self.chances = json.load(f)
-        
+    
+    
+    @staticmethod
+    def create_chance_dict():
+        with open(JSON_CHANCE_PATH, 'x') as f:
+            default_structure = {
+                "rare_chance_percentage": 5,
+                
+                "default_generated_chance": 10,
+                "individual_audio_chance": {
+                } 
+            }
+            json.dump(default_structure, f, indent=4)
     
     
     async def QUIT_HAVING_FUN(self):
@@ -67,7 +97,7 @@ class Mischief:
     
     async def mischief_interface(self):
         try:
-            if random.randint(1, self.chance_denominator) == 1:
+            if random.uniform(0, 100) <= self.settings["chance_percentage"]:
                 await self.perform_a_minuscule_amount_of_despicable_actions()
         except Exception as e:
             await self.on_error(e)
@@ -77,7 +107,7 @@ class Mischief:
         if Utils.has_terminal():
             raise error
         
-        dev = await self.info.get_bot_dev()
+        dev = await self.info_manager.get_bot_dev()
         
         if dev:
             await dev.send(f'Error in MISCHIEF:\n{error}')
@@ -98,13 +128,13 @@ class Mischief:
     
     async def get_regular_audio(self):
         selected_audio: str = random.choice(self.regular_audios)
-        audio_path: str = os.path.join(self.regular_audio_path, selected_audio)
+        audio_path: str = os.path.join(REGULAR_AUDIO_PATH, selected_audio)
         
         return audio_path, selected_audio
     
     
     async def get_random_audio(self):
-        if random.uniform(0, 100) <= self.chances["rare_chance"]:
+        if random.uniform(0, 100) <= self.chances["rare_chance_percentage"]:
             audio_path, name = await self.get_rare_audio()
         else:
             audio_path, name = await self.get_regular_audio()
@@ -116,7 +146,7 @@ class Mischief:
         voice_channels = await self.get_populated_vcs()
         
         if len(voice_channels) == 0:
-            print('Mischief: No voice channels available')
+            logger.debug('Mischief: No voice channels available')
             return
         
         await random.choice(voice_channels).connect()
@@ -136,7 +166,7 @@ class Mischief:
             flag.set()
         
         vc_bot_client.play(source, after = stop)
-        print(f"Mischief: Love me some {audio_name}")
+        logger.info(f"Mischief: Love me some {audio_name}")
         
         await flag.wait()
         

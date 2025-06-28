@@ -1,6 +1,7 @@
 import asyncio
 
 from discord.ext import commands
+from Modules.Logging.logger import logger
 from Modules.command_manipulation.command_extension import command_extension
 from Modules.cache import QuickCache
 from Modules.database_manager import DatabaseManager
@@ -19,7 +20,7 @@ class CommunityNotepad(commands.Cog):
                 'server_ID': 'INTEGER'
             }
         })
-        print(f"Cog Loaded: {self.__cog_name__}")
+        logger.info(f"Cog Loaded: {self.__cog_name__}")
     
     @commands.command(name = "notePadWrite", aliases = ["anota"])
     @command_extension('pra mim')

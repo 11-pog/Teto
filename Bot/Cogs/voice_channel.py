@@ -3,6 +3,7 @@ import asyncio, discord
 from discord.ext import commands
 from Modules.command_manipulation.command_extension import command_extension
 from Modules.command_permissions import role_blacklisted
+from Modules.Logging.logger import logger
 
 class VoiceChatCommands(commands.Cog):
     def __init__(self, bot):
@@ -11,7 +12,7 @@ class VoiceChatCommands(commands.Cog):
     
     
     async def cog_load(self):
-        print(f"Cog Loaded: {self.__cog_name__}")
+        logger.info(f"Cog Loaded: {self.__cog_name__}")
     
     
     @commands.command("joinCall", aliases = ["entra"])
@@ -46,16 +47,16 @@ class VoiceChatCommands(commands.Cog):
         
         if before.channel and not after.channel:
             self.ping_list.remove(before.channel.id)
-            print(f'Bot has been disconnected from "{before.channel.name}", in "{before.channel.guild.name}"')
+            logger.info(f'Bot has been disconnected from "{before.channel.name}", in "{before.channel.guild.name}"')
         
         elif not before.channel and after.channel:
             await self.new_connection(after.channel.guild.voice_client, after.channel.id)
-            print(f'Bot has joined the "{after.channel.name}" voice channel, in {after.channel.guild.name}')
+            logger.info(f'Bot has joined the "{after.channel.name}" voice channel, in {after.channel.guild.name}')
         
         elif before.channel and after.channel and before.channel != after.channel:
             self.ping_list.remove(before.channel.id)
             await self.new_connection(after.channel.guild.voice_client, after.channel.id)
-            print(f'Bot has moved from "{before.channel.name}" to "{after.channel.name}", in {after.channel.guild.name}')
+            logger.info(f'Bot has moved from "{before.channel.name}" to "{after.channel.name}", in {after.channel.guild.name}')
     
     
     async def new_connection(self, voice_client, channel_id):
@@ -67,7 +68,7 @@ class VoiceChatCommands(commands.Cog):
         while voice_client.channel.id in self.ping_list:
             try:
                 await voice_client.channel.guild.me.edit(nick="Autista")
-                print(f"Ping! in '{voice_client.channel.guild.name}'")
+                logger.debug(f"Ping! in '{voice_client.channel.guild.name}'")
             except discord.ClientException:
                 pass
             await asyncio.sleep(15)

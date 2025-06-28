@@ -1,6 +1,7 @@
 import asyncio, signal
 
 from discord.ext import commands
+from Modules.Logging.logger import logger
 from Modules.utils import StringTools, Utils
 from Modules.information_manager import InformationManager
 from Modules.database_manager import DatabaseManager
@@ -12,7 +13,7 @@ class GeneralEvents(commands.Cog):
         self.info = InformationManager(self.bot)
     
     async def cog_load(self):
-        print(f"Cog Loaded: {self.__cog_name__}")
+        logger.info(f"Cog Loaded: {self.__cog_name__}")
     
     
     def shutdown_request(self, signal_received, frame):
@@ -50,9 +51,9 @@ class GeneralEvents(commands.Cog):
             
             if greetings_channel:
                 await greetings_channel.send("Boa tarde")
-                print(f"Message sent to: {marked_server.name}")
+                logger.info(f"Message sent to: {marked_server.name}")
             else:
-                print(f'Guild "{marked_server.name}" does not have a "Welcome" channel')
+                logger.info(f'Guild "{marked_server.name}" does not have a "Welcome" channel')
 
 
 async def setup(bot: commands.Bot):

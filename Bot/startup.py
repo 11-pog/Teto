@@ -1,9 +1,8 @@
 from discord.ext import commands
 from discord.ext.commands import Context
 
-from Modules.Logging import logger
-from Modules.Logging.bot_logging import DiscordLogger
 from Modules.settings import Settings
+from Modules.Logging.logger import logger
 from Modules.mischief import Mischief
 from Modules.database_manager import DatabaseManager
 from Modules.command_permissions import Permission, developer
@@ -13,37 +12,27 @@ class startup(commands.Cog):
         self.bot = bot
     
     async def _object_startup(self):
-        logger.set_bot(self.bot)
-        Settings.create_settings()
+        await logger.set_bot(self.bot)
         
-        self.fnuuy = Mischief(
-            self.bot,
-            servers_with_tomfoolery_present= [
-                "Whatsapp 2",
-                "Bot Testing Ground",
-                "VILA DO CHAVES"
-                ],
-            chance_denominator=110,
-            interval_in_seconds = 12
-            )
+        self.fnuuy = Mischief(self.bot)
     
     
     async def cog_load(self):
         await self._object_startup()
         
         await DatabaseManager.connect()
-        print("DatabaseManager: Database has Connected")
+        logger.info("DatabaseManager: Database has Connected")
         
         await Permission.database_init()
-        print("Permission: Permission database has been Setup")
+        logger.info("Permission: Permission database has been Setup")
     
     
     @commands.Cog.listener()
     async def on_ready(self):
-        print(f"Bot is online! Username: {self.bot.user.name} | ID: {self.bot.user.id}")
-        print("Connected to the following guilds:")
+        logger.info(f"Bot is online! Username: {self.bot.user.name} | ID: {self.bot.user.id}")
+        logger.info("Connected to the following guilds:")
         for guild in self.bot.guilds:
-            print(f" - {guild.name} (ID: {guild.id})")
+            logger.info(f" - {guild.name} (ID: {guild.id})")
         
         await self.fnuuy.commence_moderate_mischief()
     
@@ -58,8 +47,10 @@ class startup(commands.Cog):
         this command depends on the implementation — it may reload modules,
         refresh settings, update caches, or apply recent code changes.
         '''
-        print("Reloading Mischief")
-        self.fnuuy.setup()
+        Settings.reload()
+        
+        logger.info("Reloading Mischief")
+        await self.fnuuy.setup()
 
 
 async def setup(bot: commands.Bot):

@@ -5,6 +5,7 @@ from Modules.command_manipulation.command_extension import command_extension
 from Modules.information_manager import InformationManager
 from Modules.database_manager import DatabaseManager
 from Modules.command_permissions import is_bot_developer, moderator
+from Modules.Logging.logger import logger
 
 class RolePermissionController(commands.Cog):
     def __init__(self, bot):
@@ -13,7 +14,7 @@ class RolePermissionController(commands.Cog):
         self.info_manager = InformationManager(self.bot)
     
     async def cog_load(self):
-        print(f"Cog Loaded: {self.__cog_name__}")
+        logger.info(f"Cog Loaded: {self.__cog_name__}")
     
     @commands.command(name="permissão")
     @command_extension("de cargo", "pro cargo")
