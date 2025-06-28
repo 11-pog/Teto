@@ -12,3 +12,7 @@ Bot/Resources/Database/*
 # Cache
 Bot/Resources/Cache/*
 !Bot/Resources/Cache/README.txt
+
+# Config
+Bot/Resources/Settings/*
+!Bot/Resources/Settings/README.txt

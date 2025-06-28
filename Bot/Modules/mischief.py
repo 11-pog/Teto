@@ -4,7 +4,7 @@ import json
 from Modules.settings import Settings
 from Modules.Logging.logger import logger
 import os, random, discord, asyncio, resources_path
-from typing import List
+from typing import Dict, List
 
 from discord.ext.commands import Bot
 
@@ -121,6 +121,22 @@ class Mischief:
                 voice_channels += guild.voice_channels
         
         return [voice_channel for voice_channel in voice_channels if len(voice_channel.voice_states) > 0]
+    
+    
+    async def updt_json(self):
+        with open(JSON_CHANCE_PATH, 'w') as f:
+            json.dump(self.chances, f)
+    
+    
+    async def fill_json_default_songs(self):
+        song_chances: Dict[str, int] = self.chances["individual_audio_chance"]
+        default_chance = self.chances["default_generated_chance"]
+        
+        for filename in self.rare_audios:
+            song_chances.setdefault(filename, default_chance)
+        
+        self.chances["individual_audio_chance"] = song_chances
+        await self.updt_json
     
     
     async def get_rare_audio(self):

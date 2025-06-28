@@ -1,5 +1,5 @@
 {
-    "rare_chance_percentage": 5, 
+    "rare_chance_percentage": 15, 
 
     "default_generated_chance": 10,
     "individual_audio_chance": {
