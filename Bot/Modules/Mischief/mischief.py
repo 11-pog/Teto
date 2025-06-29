@@ -176,6 +176,10 @@ class Mischief(ReloadableComponent):
     
     
     async def perform_a_minuscule_amount_of_despicable_actions(self, guild: discord.Guild):
+        if guild.voice_client:
+            logger.debug("Bot already in a voice channel")
+            return
+        
         active_voice_channels = await self.get_populated_vcs(guild)
         
         if len(active_voice_channels) == 0:
