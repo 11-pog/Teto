@@ -16,3 +16,6 @@ Bot/Resources/Cache/*
 # Config
 Bot/Resources/Settings/*
 !Bot/Resources/Settings/README.txt
+
+# Rare Audio
+Bot/Resources/Audios/Rare/rare_chances.json
