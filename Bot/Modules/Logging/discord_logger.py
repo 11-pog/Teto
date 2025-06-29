@@ -55,6 +55,23 @@ class DiscordLogger(logging.Logger):
         return self.log(logging.CRITICAL, msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
 
 
+_levelValues = logging.getLevelNamesMapping()
+def getLevelValue(name: str):
+    """
+    Retrieve the numeric value associated with a given logging level name.
+
+    Args:
+        name (str): The name of the logging level (e.g., 'INFO', 'DEBUG').
+
+    Returns:
+        int: The numeric value corresponding to the specified logging level name.
+
+    Raises:
+        KeyError: If the provided name does not exist in the _levelValues dictionary.
+    """
+    return _levelValues[name.upper()]
+
+
 if __name__ == "__main__":
     DiscordLogger.setup("AutismBOT")
     DiscordLogger.log("Teste bizonho", level=logging.INFO)

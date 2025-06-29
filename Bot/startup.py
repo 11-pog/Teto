@@ -1,9 +1,10 @@
 from discord.ext import commands
 from discord.ext.commands import Context
 
+from Modules.reloadable import ReloadableComponent
 from Modules.settings import Settings
 from Modules.Logging.logger import logger
-from Modules.mischief import Mischief
+from Modules.Mischief.mischief import Mischief
 from Modules.database_manager import DatabaseManager
 from Modules.command_permissions import Permission, developer
 
@@ -47,10 +48,12 @@ class startup(commands.Cog):
         this command depends on the implementation — it may reload modules,
         refresh settings, update caches, or apply recent code changes.
         '''
+        ctx.author.send("Reloading...")
+        
+        logger.info("Reloading bot configurations", dev_fallback=True)
         Settings.reload()
         
-        logger.info("Reloading Mischief")
-        await self.fnuuy.setup()
+        ReloadableComponent.reload_all_instances()
 
 
 async def setup(bot: commands.Bot):

@@ -1,13 +1,18 @@
-import os, json, resources_path
-from typing import Any, Dict, List
-
+import os, json, resources_path, weakref
+from typing import Any, Dict, ClassVar
 
 SETTINGS_PATH = resources_path.SETTINGS
 
 class Settings(dict):
-    _instances: List["Settings"] = []
+    _instances = []
     
     def __init__(self, name: str):
+        """
+        Initialize a Settings instance.
+        
+        Args:
+            name (str): The name of the settings file (without extension) to load or create.
+        """
         self.name = name
         self.path = self.get_path()
         

@@ -19,8 +19,8 @@ class DiscordStyleFormatter(logging.Formatter):
 
     def format(self, record):
         level_color = self.COLORS.get(record.levelname, "")
-        timestamp = f"{self.TIME_COLOR}{self.formatTime(record, self.datefmt)}{self.RESET}"
-        levelname = f"{level_color}{record.levelname:<8}{self.RESET}"
+        timestamp = f"{self.BOLD}{self.TIME_COLOR}{self.formatTime(record, self.datefmt)}{self.RESET}"
+        levelname = f"{self.BOLD}{level_color}{record.levelname:<8}{self.RESET}"
         name = f"{self.NAME_COLOR}{record.name}{self.RESET}"
 
         return f"{timestamp} {levelname} {name} {record.getMessage()}"
