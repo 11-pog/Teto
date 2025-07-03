@@ -1,14 +1,15 @@
+from collections.abc import Mapping
 import os, json, resources_path, weakref
-from typing import Any, Dict, ClassVar
+from typing import Any, Dict
 
 SETTINGS_PATH = resources_path.SETTINGS
 
-class Settings(dict):
-    _instances = []
+class Settings(Mapping):
+    _instances = weakref.WeakSet()
     
     def __init__(self, name: str):
         """
-        Initialize a Settings instance.
+        Initialize a Settings instance.does
         
         Args:
             name (str): The name of the settings file (without extension) to load or create.
@@ -16,14 +17,24 @@ class Settings(dict):
         self.name = name
         self.path = self.get_path()
         
-        super().__init__()
+        self._data = {}
         
         if not os.path.exists(self.path):
             self.create_file()
         else:
             self.load()
         
-        Settings._instances.append(self)
+        Settings._instances.add(self)
+    
+    
+    def __getitem__(self, key):
+        return self._data[key]
+    
+    def __iter__(self):
+        return iter(self._data)
+    
+    def __len__(self):
+        return len(self._data)
     
     
     @classmethod
@@ -45,20 +56,18 @@ class Settings(dict):
     
     def save(self):
         with open(self.path, "w", encoding='utf-8') as f:
-            json.dump(self, f, indent=4, ensure_ascii=True)
+            json.dump(self._data, f, indent=4, ensure_ascii=True)
     
     def load(self):
         with open(self.path, "r", encoding='utf-8') as f:
-            data = json.load(f)
-            self.clear()
-            self.update(data)
+            self._data = json.load(f)
     
     
     def setup(self, default_structure = Dict[str, Any]):
         self.load()
         
         for key in default_structure:
-            if key not in self:
-                self[key] = default_structure[key]
+            if key not in self._data:
+                self._data[key] = default_structure[key]
         
         self.save()
