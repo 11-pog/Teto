@@ -36,6 +36,9 @@ class Settings(Mapping):
     def __len__(self):
         return len(self._data)
     
+    def __hash__(self):
+        return hash(id(self))
+    
     
     @classmethod
     def reload(cls):
