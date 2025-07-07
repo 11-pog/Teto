@@ -1,6 +1,4 @@
-import asyncio
-import signal
-import traceback
+import asyncio, signal
 from typing import Any, Tuple
 
 import discord
