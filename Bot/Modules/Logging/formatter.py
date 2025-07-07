@@ -7,7 +7,7 @@ class DiscordStyleFormatter(logging.Formatter):
     BOLD = "\033[1m"
 
     COLORS = {
-        "DEBUG": "\033[0;96m",     # Cyan
+        "DEBUG": "\033[0;96m",   # Cyan
         "INFO": "\033[34m",      # Blue
         "WARNING": "\033[33m",   # Yellow
         "ERROR": "\033[31m",     # Red

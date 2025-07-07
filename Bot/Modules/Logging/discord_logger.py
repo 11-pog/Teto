@@ -3,6 +3,7 @@ from discord.ext.commands import Bot
 
 from Modules.information_manager import InformationManager
 from Modules.utils import Utils
+from formatter import DiscordStyleFormatter
 
 import logging
 
@@ -55,6 +56,10 @@ class DiscordLogger(logging.Logger):
     
     def critical(self, msg, dev_fallback: bool | None = None, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
         return self.log(logging.CRITICAL, msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
+    
+    
+    def exception(self, msg, *args, exc_info = True, stack_info = False, stacklevel = 1, extra = None):
+        return self.error(msg, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
 
 
 _levelValues = logging.getLevelNamesMapping()
@@ -75,9 +80,16 @@ def getLevelValue(name: str):
 
 
 if __name__ == "__main__":
-    DiscordLogger.setup("AutismBOT")
-    DiscordLogger.log("Teste bizonho", level=logging.INFO)
-    DiscordLogger.log("Teste bizonho", level=logging.ERROR)
-    DiscordLogger.log("Teste bizonho", level=logging.DEBUG)
-    DiscordLogger.log("Teste bizonho", level=logging.WARNING)
-    DiscordLogger.log("Teste bizonho", level=logging.CRITICAL)
+    logger = DiscordLogger(name="NOME", level= logging.DEBUG)
+    
+    _handler = logging.StreamHandler()
+    _formatter = DiscordStyleFormatter(datefmt='%Y-%m-%d %H:%M:%S')
+    _handler.setFormatter(_formatter)
+    
+    logger.addHandler(_handler)
+    
+    logger.debug("Teste bizonho")
+    logger.info("Teste bizonho")
+    logger.error("Teste bizonho")
+    logger.warning("Teste bizonho")
+    logger.critical("Teste bizonho")
