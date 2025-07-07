@@ -1,3 +1,5 @@
+import asyncio
+import signal
 import traceback
 from typing import Any, Tuple
 
@@ -42,6 +44,8 @@ class BotClient(Bot):
             'Cogs.mass_message_deletion',
             'Cogs.role_tag_controller'
         )
+        
+        self.register_signal_handlers()
     
     
     async def close(self):
@@ -83,6 +87,12 @@ class BotClient(Bot):
         embed.timestamp = context.message.created_at
         
         await self.dev_user.send(embed=embed)
+    
+    
+    def register_signal_handlers(self):
+        loop = asyncio.get_running_loop()
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            loop.add_signal_handler(sig, lambda: asyncio.create_task(self.close()))
     
     
     async def on_message(self, message: Message):

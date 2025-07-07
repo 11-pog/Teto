@@ -1,5 +1,4 @@
-import asyncio, signal
-
+from discord import Message
 from discord.ext import commands
 from Modules.Logging.logger import logger
 from Modules.utils import StringTools, Utils
@@ -12,16 +11,19 @@ class GeneralEvents(commands.Cog):
         self.database = DatabaseManager()
         self.info = InformationManager(self.bot)
     
-    async def cog_load(self):
+    async def cog_load(self):   
+        await self.database.setup(structure={
+            'storedLocations': {
+                'channel_ID': 'INTEGER',
+                'server_ID': 'INTEGER',
+                'general_ID': 'INTEGER'
+            }
+        })
         logger.info(f"Cog Loaded: {self.__cog_name__}")
     
     
-    def shutdown_request(self, signal_received, frame):
-        self.bot.loop.create_task(DatabaseManager.disconnect_all())
-        self.bot.loop.create_task(self.bot.close())
-    
     @commands.Cog.listener()
-    async def on_message(self, msg):
+    async def on_message(self, msg: Message):
         if str.lower(msg.content) == 'fat fuck' and msg.author.id != self.bot.user.id:
             await msg.channel.send(msg.content)
         
@@ -34,14 +36,6 @@ class GeneralEvents(commands.Cog):
     
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.database.setup(structure={
-            'storedLocations': {
-                'channel_ID': 'INTEGER',
-                'server_ID': 'INTEGER',
-                'general_ID': 'INTEGER'
-            }
-        })
-        
         fetch_locations_query = "SELECT channel_ID, server_ID FROM storedLocations WHERE general_ID = 0"
         locations_data = await self.database.fetchall(fetch_locations_query)
         
@@ -57,9 +51,4 @@ class GeneralEvents(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    cog = GeneralEvents(bot)
-    
-    signal.signal(signal.SIGTERM, cog.shutdown_request)
-    signal.signal(signal.SIGINT, cog.shutdown_request)
-    
-    await bot.add_cog(cog)
+    await bot.add_cog(GeneralEvents(bot))
