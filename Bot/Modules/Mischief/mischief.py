@@ -1,12 +1,14 @@
 # mischief.py
 
-import json
 from Modules.reloadable import ReloadableComponent
 from Modules.Mischief.mischief_job import MischiefJob
 from Modules.settings import Settings
 from Modules.Logging.logger import logger
 import os, random, discord, asyncio, resources_path
 from typing import Dict, List
+
+import json
+from json import JSONDecodeError
 
 from discord.ext.commands import Bot
 
@@ -128,7 +130,7 @@ class Mischief(ReloadableComponent):
         try:
             with open(JSON_CHANCE_PATH, 'r') as f:
                 self.chances: Dict[str, int] = json.load(f)
-        except json.JSONDecodeError:
+        except JSONDecodeError:
             logger.error("Json Rare Chances had problems decoding")
             await self.save_json()
         except FileNotFoundError:
