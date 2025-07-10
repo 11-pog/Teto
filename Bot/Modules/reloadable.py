@@ -42,7 +42,7 @@ class ReloadableComponent:
                 "There is no loop present in this thread, you should pass self._loop manually"
                 )
         
-        asyncio.wait_for(self._loop.create_task(func()))
+        self._loop.create_task(func())
     
     
     def load(self):
