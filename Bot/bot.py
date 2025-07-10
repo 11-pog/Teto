@@ -1,7 +1,6 @@
-import asyncio, signal
 from typing import Any, Tuple
 
-import discord
+import discord, signal
 from discord.ext.commands import Bot, Context
 from discord import Message, app_commands
 
@@ -96,8 +95,11 @@ class BotClient(Bot):
     
     
     async def on_message(self, message: Message):
-        if message.content.startswith(tuple(await self.get_prefix(message))) and await is_user_role_tagged(await self.get_context(message), 'forbid_BOT'):
-            logger.info(f'Blacklisted user "{message.author.name}" tried using bot in {message.guild.name}, {message.channel.name}')
-            return
+        prefixes = await self.get_prefix(message)
+        if message.content.startswith(tuple(prefixes)):
+            ctx = await self.get_context(message)
+            if await is_user_role_tagged(ctx, 'forbid_BOT'):
+                logger.info(f'Blacklisted user "{message.author.name}" tried using bot in {message.guild.name}, {message.channel.name}')
+                return
         
         await self.process_commands(message)
