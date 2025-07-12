@@ -45,9 +45,7 @@ class GeneralEvents(commands.Cog):
             
             if greetings_channel:
                 await greetings_channel.send("Boa tarde")
-                logger.info(f"Message sent to: {marked_server.name}")
-            else:
-                logger.info(f'Guild "{marked_server.name}" does not have a "Welcome" channel')
+                logger.info(f"Startup message sent to marked channel: {marked_server.name}")
 
 
 async def setup(bot: commands.Bot):

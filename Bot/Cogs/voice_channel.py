@@ -19,8 +19,8 @@ class VoiceChatCommands(commands.Cog):
     @command_extension("ai", "ae")
     @role_blacklisted("forbid_audio_playback", "forbid_voice_chat_control",
         rejection_message="Tu tá BANIDO de mandar o bot coisar na call")
-    async def joinCall(self, ctx):
-        if hasattr(ctx.author.voice, 'channel'):
+    async def joinCall(self, ctx: commands.Context):
+        if ctx.author.voice is not None and hasattr(ctx.author.voice, 'channel'):
             await ctx.reply("ok <:cat:1264072257433632789>")
             await ctx.author.voice.channel.connect()
         else:
@@ -30,16 +30,16 @@ class VoiceChatCommands(commands.Cog):
     @commands.command("leaveCall", aliases = ["vaza", "sai"])
     @role_blacklisted("forbid_audio_playback", "forbid_voice_chat_control",
         rejection_message="Tu tá BANIDO de mandar o bot coisar na call")
-    async def leaveCall(self, ctx):
+    async def leaveCall(self, ctx: commands.Context):
         current_call = ctx.voice_client
         
         if current_call:
             await current_call.disconnect()
             await ctx.reply("ok <:cat:1264072257433632789>")
         else:
-            await ctx.reply("eu nem to em call uai")
+            await ctx.reply("Eu nem to em call uai")
     
-    
+    '''
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
         if member != self.bot.user:
@@ -72,8 +72,7 @@ class VoiceChatCommands(commands.Cog):
             except discord.ClientException:
                 pass
             await asyncio.sleep(15)
-
-
+'''
 
 
 async def setup(bot: commands.Bot):

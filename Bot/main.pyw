@@ -35,4 +35,4 @@ bot = BotClient(
 
 
 if __name__ == '__main__':
-    bot.run(os.environ['AUTISM_DISCORD_TOKEN'])
+    bot.run(os.environ['TETO_DISCORD_TOKEN'])

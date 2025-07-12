@@ -14,7 +14,7 @@ class DiscordStyleFormatter(logging.Formatter):
         "CRITICAL": "\033[41m",  # Red background
     }
 
-    NAME_COLOR = "\033[35m"  # Purple/magenta
+    NAME_COLOR = "\033[0;31m"  # Teto Color
     TIME_COLOR = "\033[90m"  # Dim gray
 
     def format(self, record):

@@ -1,5 +1,3 @@
-import asyncio
-
 from discord.ext import commands
 from Modules.Logging.logger import logger
 from Modules.command_manipulation.command_extension import command_extension

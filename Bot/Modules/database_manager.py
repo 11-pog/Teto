@@ -1,13 +1,10 @@
-import asyncio, aiosqlite, resources_path
+import aiosqlite, resources_path
 from functools import wraps
-from typing import Any, Callable, Iterable, List, Mapping, Optional, Set
+from typing import Any, Callable, Iterable, List, Mapping, Optional
 
 class DatabaseManager:
     database = None
     cursor = None
-    
-    def __init__(self):
-        pass
     
     @classmethod
     async def connect(cls):
