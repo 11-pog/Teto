@@ -75,4 +75,4 @@ lista de categorias de permissão:
 
 comandos:
 - **"<prefix> permissão de cargo [cargo] [categoria]"**: Define a categoria de permissão para o cargo especificado.
-- **"<prefix> despermissão de cargo [cargo] [categoria]"**: __**WIP**__ Remove a categoria de permissão para o cargo especificado.
+- **"<prefix> despermissão de cargo [cargo] [categoria]"**: Remove a categoria de permissão para o cargo especificado.
