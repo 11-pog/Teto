@@ -1,6 +1,7 @@
 from discord.ext import commands
 from discord.ext.commands import Context
 
+from Modules.Logging.discord_logger import DevFallback
 from Modules.reloadable import ReloadableComponent
 from Modules.settings import Settings
 from Modules.Logging.logger import logger
@@ -48,9 +49,8 @@ class startup(commands.Cog):
         this command depends on the implementation — it may reload modules,
         refresh settings, update caches, or apply recent code changes.
         '''
-        await ctx.author.send("Reloading...")
         
-        logger.info("Reloading bot configurations", dev_fallback=True)
+        logger.info("Reloading bot configurations", dev_fallback=DevFallback.ALWAYS)
         Settings.reload()
         
         ReloadableComponent.reload_all_instances()

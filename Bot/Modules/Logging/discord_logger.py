@@ -1,3 +1,4 @@
+from enum import Enum, auto
 from discord import User
 from discord.ext.commands import Bot
 
@@ -6,6 +7,14 @@ from Modules.utils import Utils
 from Modules.Logging.formatter import DiscordStyleFormatter
 
 import logging
+
+
+class DevFallback(Enum):
+    LOG_LEVEL_NO_TERMINAL = auto()
+    LOG_LEVEL = auto()
+    ALWAYS = auto()
+    NEVER = auto()
+    YES_IF_NO_TERMINAL = auto()
 
 
 class DiscordLogger(logging.Logger):
@@ -31,35 +40,44 @@ class DiscordLogger(logging.Logger):
     def isFallbackEnabledFor(self, level: int):
         return level >= self.fallback_level
     
-    def log(self, level, msg, dev_fallback: bool | None = None, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
-        if DiscordLogger._has_terminal:
-            return super().log(level, msg, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
+    def should_fallback(self, level, dev_fallback: DevFallback) -> bool:
+        match dev_fallback:
+            case DevFallback.LOG_LEVEL:
+                return self.isFallbackEnabledFor(level)
+            case DevFallback.LOG_LEVEL_NO_TERMINAL:
+                return self.isFallbackEnabledFor(level) and not self._has_terminal
+            case DevFallback.YES_IF_NO_TERMINAL:
+                return not self._has_terminal
+            case DevFallback.ALWAYS:
+                return True
+            case DevFallback.NEVER:
+                return False
+    
+    def log(self, level, msg, dev_fallback: DevFallback = DevFallback.LOG_LEVEL_NO_TERMINAL, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
+        super().log(level, msg, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
         
-        if dev_fallback is None:
-            dev_fallback = self.isFallbackEnabledFor(level)
-        
-        if dev_fallback and DiscordLogger._bot_dev is not None and DiscordLogger._bot is not None:
+        will_fallback = self.should_fallback(level, dev_fallback)
+        if will_fallback and DiscordLogger._bot_dev is not None and DiscordLogger._bot is not None:
             DiscordLogger._bot.loop.create_task(DiscordLogger._bot_dev.send(msg))
     
     
-    def info(self, msg, dev_fallback: bool | None = None, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
+    def info(self, msg, dev_fallback: DevFallback = DevFallback.LOG_LEVEL_NO_TERMINAL, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
         return self.log(logging.INFO, msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
     
-    def warning(self, msg, dev_fallback: bool | None = None, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
+    def warning(self, msg, dev_fallback: DevFallback = DevFallback.LOG_LEVEL_NO_TERMINAL, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
         return self.log(logging.WARNING, msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
     
-    def debug(self, msg, dev_fallback: bool | None = None, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
+    def debug(self, msg, dev_fallback: DevFallback = DevFallback.LOG_LEVEL_NO_TERMINAL, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
         return self.log(logging.DEBUG, msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
     
-    def error(self, msg, dev_fallback: bool | None = None, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
+    def error(self, msg, dev_fallback: DevFallback = DevFallback.LOG_LEVEL_NO_TERMINAL, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
         return self.log(logging.ERROR, msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
     
-    def critical(self, msg, dev_fallback: bool | None = None, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
+    def critical(self, msg, dev_fallback: DevFallback = DevFallback.LOG_LEVEL_NO_TERMINAL, *args, exc_info = None, stack_info = False, stacklevel = 1, extra = None):
         return self.log(logging.CRITICAL, msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
     
-    
-    def exception(self, msg, *args, exc_info = True, stack_info = False, stacklevel = 1, extra = None):
-        return self.error(msg, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
+    def exception(self, msg, dev_fallback: DevFallback = DevFallback.LOG_LEVEL_NO_TERMINAL, *args, exc_info = True, stack_info = False, stacklevel = 1, extra = None):
+        return self.error(msg, dev_fallback=dev_fallback, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
 
 
 _levelValues = logging.getLevelNamesMapping()
