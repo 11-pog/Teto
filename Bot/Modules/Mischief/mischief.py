@@ -179,7 +179,7 @@ class Mischief(ReloadableComponent):
     async def get_random_audio(self):
         random_value = random.uniform(0, 100)
         logger.debug(f"Mischief: Random value for rare audio selection: {random_value}")
-        if random_value < self.chances.get("rare_chance_percentage", default = 1):
+        if random_value < self.chances.get("rare_chance_percentage", 1):
             audio_path, name = await self.get_rare_audio()
         else:
             audio_path, name = await self.get_regular_audio()
@@ -205,6 +205,7 @@ class Mischief(ReloadableComponent):
         
         voice_client: discord.VoiceClient = self.bot.voice_clients[0]
         
+        logger.info(f"Mischief: Doing some stuff in {guild.name}")
         await asyncio.sleep(random.randint(1, 10))
         
         playback_complete_event = asyncio.Event()
@@ -214,7 +215,6 @@ class Mischief(ReloadableComponent):
                 logger.error(err)
             playback_complete_event.set()
         
-        logger.info(f"Mischief: Doing some stuff in {guild.name}")
         
         voice_client.play(audio_source, after = stop)
         logger.info(f"Mischief: Love me some {audio_name}")
