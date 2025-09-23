@@ -24,7 +24,7 @@ def _discover_mischiefs(bot):
         module = importlib.import_module(f"{package_name}.{module_name}")
         
         for _, obj in inspect.getmembers(module, inspect.isclass):
-            if issubclass(obj, BaseMischief) and obj is not BaseMischief:
+            if issubclass(obj, BaseMischief) and obj.__module__ != 'mischief.interface':
                 name = obj.mischief_name or obj.__name__
                 
                 logger.info(f"Found mischief action: {name}")

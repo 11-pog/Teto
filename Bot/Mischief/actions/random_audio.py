@@ -240,6 +240,15 @@ class RandomAudioMischief(CogMischief):
         return audio_path, name
     
     
+    def get_audio_path(self, audio):
+        if audio in self.regular_audios:
+            return os.path.join(REGULAR_AUDIO_PATH, audio)
+        elif audio in self.rare_audios:
+            return os.path.join(RARE_AUDIO_PATH, audio)
+        
+        raise ValueError("audio does not exist!")
+    
+    
     async def perform_a_minuscule_amount_of_despicable_actions(self, guild: discord.Guild):
         if guild.voice_client:
             logger.debug("Bot already in a voice channel")
@@ -259,29 +268,35 @@ class RandomAudioMischief(CogMischief):
     
     
     async def play_audio(self, audio_path, audio_name):
+        guild = None
+        for vc in self.bot.voice_clients:
+            if vc.is_connected():
+                guild = vc.guild
+                voice_client = vc
+                break
+        else:
+            # no voice client connected → should never happen
+            logger.warning("No voice client found!")
+            return
+
         audio_source = discord.FFmpegPCMAudio(audio_path)
-        
-        voice_client: discord.VoiceClient = self.bot.voice_clients[0]
-        
-        await asyncio.sleep(random.randint(1, 10))
-        
         playback_complete_event = asyncio.Event()
         
+        await asyncio.sleep(random.uniform(1, 6))
+
         def stop(err: Exception | None):
             if err:
                 logger.error(err)
             playback_complete_event.set()
-        
-        
-        voice_client.play(audio_source, after = stop)
+
+        voice_client.play(audio_source, after=stop)
         logger.info(f"Mischief: Love me some {audio_name}")
-        
         await playback_complete_event.wait()
-        
-        await asyncio.sleep(random.uniform(0, 0.2))  
+
+        await asyncio.sleep(random.uniform(0, 0.2))
         await voice_client.disconnect()
-    
-    
+
+
     @commands.command(name="venha")
     @command_extension(
         "comer cimento",
@@ -291,30 +306,30 @@ class RandomAudioMischief(CogMischief):
         "nos mogar",
         "vir",
         "chegar mais")
-    async def force_audio_playback(self, ctx: Context, *, audio = None):
-        audios = self.regular_audios +  self.rare_audios
-        
+    async def force_audio_playback(self, ctx: Context, *, audio=None):
         if ctx.author.voice is None:
             await ctx.reply("irmãozinho tu nem tá em call")
             return
         
-        guild = ctx.author.voice.channel.guild
-        
-        if any(vc.guild.id == guild.id for vc in self.bot.voice_clients):
-            await ctx.reply("Não")
-            return
-        
         channel = ctx.author.voice.channel
-        await channel.connect()
+        guild = channel.guild
         
-        if audio is None:
+        voice_client = discord.utils.get(self.bot.voice_clients, guild=guild)
+        if voice_client is None or not voice_client.is_connected():
+            voice_client = await channel.connect()
+        
+        logger.debug(audio);
+        
+        if audio is None or audio == "":
             audio_path, selected_audio = await self.get_random_audio()
+            logger.debug(f"Random -> {selected_audio}")
         else:
+            audios = self.regular_audios + self.rare_audios
             matches = [a for a in audios if audio.lower() in a.lower()]
             if not matches:
                 await ctx.reply("Audio not found!")
                 return
-            selected_audio = matches[0]  # pick the first match
-            audio_path = os.path.join(REGULAR_AUDIO_PATH, selected_audio)
+            selected_audio = matches[0]
+            audio_path = self.get_audio_path(selected_audio)
         
         await self.play_audio(audio_path, selected_audio)

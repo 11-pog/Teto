@@ -1,7 +1,7 @@
 from typing import Any, Tuple
 
 import discord, signal
-from discord.ext.commands import Bot, Context
+from discord.ext.commands import AutoShardedBot, Context
 from discord import Message, app_commands
 
 from Modules.Logging.logger import logger
@@ -9,7 +9,7 @@ from Modules.command_permissions import is_user_role_tagged
 from Modules.information_manager import InformationManager
 from Modules.database_manager import DatabaseManager
 
-class BotClient(Bot):
+class BotClient(AutoShardedBot):
     def __init__(self, command_prefix, *, send_errors_to_developer_dm = False, help_command = ..., tree_cls = app_commands.CommandTree, description = None, allowed_contexts = ..., allowed_installs = ..., intents, **options):
         super().__init__(command_prefix, help_command=help_command, tree_cls=tree_cls, description=description, allowed_contexts=allowed_contexts, allowed_installs=allowed_installs, intents=intents, **options)
         
