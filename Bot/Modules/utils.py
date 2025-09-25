@@ -23,7 +23,7 @@ class Utils:
         path = os.path.join(resources_path.TEXTS, 'the_big_forbidden_list_of_bad_words.txt')
         with open(path, 'r') as file:
             forbidden_list = file.read().split(',')
-            forbidden_list = IterTools.for_each_item(forbidden_list, StringTools.clean)
+            forbidden_list = IterTools.for_each_item(forbidden_list, StringTools.normalize_str)
             
             return forbidden_list
 
@@ -44,12 +44,12 @@ class StringTools:
         Returns:
             List[str]: List of cleaned strings
         """
-        return [StringTools.clean(msg) for msg in iter]
+        return [StringTools.normalize_str(msg) for msg in iter]
     
     @staticmethod
-    def clean(msg: str):
+    def normalize_str(msg: str):
         """
-        Cleans a string by removing cursed characters and normalizing it for comparison.
+        Normalize a string by removing cursed characters and normalizing it for comparison.
 
         This method performs the following operations on the input string:
         - Converts to lowercase

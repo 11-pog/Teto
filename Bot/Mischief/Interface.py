@@ -15,11 +15,14 @@ class BaseMischief(Enableable, ReloadableComponent):
 
 
 class TextMischief(BaseMischief):
-    async def validate(self, msg):
+    def check(self, normalized_text, message):
         raise NotImplementedError
     
-    async def execute(self, validated_msg):
+    async def execute(self, normalized_text, message):
         raise NotImplementedError
+    
+    def _validate(self, normalized_text, message):
+        return self.is_enable and self.check(normalized_text, message)
 
 
 class CogMischief(BaseMischief, Cog):

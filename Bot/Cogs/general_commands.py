@@ -69,7 +69,7 @@ class GeneralCommands(commands.Cog):
             help_text = f.read()
         
         is_mod = await is_moderator(ctx)
-        only_mod = args is not None and 'so mod' in StringTools.clean(args)
+        only_mod = args is not None and 'so mod' in StringTools.normalize_str(args)
         
         if not is_mod:
             return help_text.split('--MODERATORCOMMANDS--')[0]

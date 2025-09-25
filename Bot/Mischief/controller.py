@@ -10,14 +10,27 @@ from discord.ext import commands
 from discord import Message
 
 from resources_path import BASE_PATH
-from mischief.interface import BaseMischief, TextMischief
+from mischief.interface import BaseMischief, CogMischief, TextMischief
 from Modules.utils import StringTools
 from Modules.Logging.logger import logger
 
+
+_interfaces_mod = importlib.import_module("mischief.interface")
+_base_classes = set([
+    obj
+    for _, obj in inspect.getmembers(_interfaces_mod, inspect.isclass) 
+    if issubclass(obj, BaseMischief)
+    ])
+
+
+def _discover_class_inheritance_all(cls):
+    return [base for base in cls.__mro__ if base in _base_classes]
+
+
 def _discover_mischiefs(bot):
-    mischiefs = {}
-    package_name = "mischief.actions"
+    _found = {}
     
+    package_name = "mischief.actions"
     import_path = os.path.join(BASE_PATH, "mischief", "actions")
     
     for _, module_name, _ in pkgutil.iter_modules([str(import_path)]):
@@ -29,25 +42,27 @@ def _discover_mischiefs(bot):
                 
                 logger.info(f"Found mischief action: {name}")
                 
-                mischiefs[name] = obj(bot)
-    return mischiefs
+                instance = obj(bot)
+                
+                for bucket in _discover_class_inheritance_all(obj):
+                    _found.setdefault(bucket, {})[name] = instance
+    return _found
 
 class MischiefController(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.mischief_registry: Dict[str, BaseMischief] = _discover_mischiefs(bot)
     
-    async def _add_mischiefs_if_cog(self):
-        for name, item in self.mischief_registry.items():
-            if issubclass(item.__class__, Cog):
-                logger.info(f"Loaded mischief action {name} as cog")
-                await self.bot.add_cog(item)
+    async def _add_cog_mischiefs(self):
+        for name, item in self.mischief_registry[CogMischief].items():
+            logger.info(f"Loaded mischief action {name} as cog")
+            await self.bot.add_cog(item)
     
     def _get_mischiefs(self, *args):
-        return [m for m in (self.mischief_registry.get(x) for x in args) if m is not None]
+        return [m for m in (self.mischief_registry[BaseMischief].get(x) for x in args) if m is not None]
     
     async def cog_load(self):
-        await self._add_mischiefs_if_cog()
+        await self._add_cog_mischiefs()
         logger.info(f"Cog Loaded: {self.__cog_name__}")
     
     
@@ -59,6 +74,7 @@ class MischiefController(Cog):
             return await ctx.reply("nuh uh")
         
         for item in mischife:
+            item.is_enable = True
             item.enable()
         
         await ctx.message.add_reaction("<:cat:1264072257433632789>")
@@ -72,6 +88,7 @@ class MischiefController(Cog):
             return await ctx.reply("nuh uh")
         
         for item in mischife:
+            item.is_enable = False
             item.disable()
         
         await ctx.message.add_reaction("<:cat:1264072257433632789>")
@@ -79,23 +96,18 @@ class MischiefController(Cog):
     
     @commands.Cog.listener()
     async def on_ready(self):
-        for mischife in self.mischief_registry.values():
+        for mischife in self.mischief_registry[BaseMischief].values():
             await mischife.initiate()
     
     
     @commands.Cog.listener()
     async def on_message(self, msg: Message):
         content = msg.content
-        content = StringTools.clean(content)
+        content = StringTools.normalize_str(content)
         
-        await self.MINIGAMES(msg, content)
-    
-    # Text Mischief Lmfao
-    
-    async def MINIGAMES(self, msg: Message, normalized_content: str):
-        if 'minigame' in normalized_content:
-            await msg.add_reaction("<:MINIGAMES:1400192834073530400>")
-
+        for text_mischief in self.mischief_registry[TextMischief].values():
+            if text_mischief._validate(content, msg):
+                await text_mischief.execute(content, msg)
 
 
 

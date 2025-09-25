@@ -8,7 +8,7 @@ from Modules.command_manipulation._core import get_original_func
 def command_extension(*extensions: str):
     extensions = tuple(IterTools.for_each_item(
         extensions,
-        StringTools.clean,
+        StringTools.normalize_str,
         lambda phrase: phrase.split(' ')
         ))
     min_extension_size = IterTools.get_smallest_size(extensions)
@@ -54,7 +54,7 @@ def _extension_decorator(extensions: Iterable[str], min_extension_size: int | fl
             
             for extension in extensions:
                 try:
-                    is_match = all(words[index] == StringTools.clean(word) for index, word in enumerate(extension))
+                    is_match = all(words[index] == StringTools.normalize_str(word) for index, word in enumerate(extension))
                 except ValueError:
                     pass
                 

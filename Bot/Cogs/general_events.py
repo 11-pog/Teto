@@ -24,13 +24,10 @@ class GeneralEvents(commands.Cog):
     
     @commands.Cog.listener()
     async def on_message(self, msg: Message):
-        if str.lower(msg.content) == 'fat fuck' and msg.author.id != self.bot.user.id:
-            await msg.channel.send(msg.content)
-        
-        elif str.lower(msg.content).startswith(tuple(await self.bot.get_prefix(msg))):
+        if str.lower(msg.content).startswith(tuple(await self.bot.get_prefix(msg))):
             the_big_forbidden_list_of_bad_words = await Utils.get_the_forbidden_list()
             
-            if any(bad_word in StringTools.clean(msg.content) for bad_word in the_big_forbidden_list_of_bad_words):
+            if any(bad_word in StringTools.normalize_str(msg.content) for bad_word in the_big_forbidden_list_of_bad_words):
                 await msg.reply("<:spong_bop:1264260742975197264>")
     
     
