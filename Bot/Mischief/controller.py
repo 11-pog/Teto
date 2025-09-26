@@ -107,7 +107,7 @@ class MischiefController(Cog):
         
         for text_mischief in self.mischief_registry[TextMischief].values():
             if await text_mischief._validate(content, msg):
-                await TextMischief._async_dispatch_function(text_mischief.execute, content, msg)
+                await TextMischief._async_dispatch_func(text_mischief.execute, content, msg)
 
 
 

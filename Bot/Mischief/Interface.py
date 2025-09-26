@@ -2,7 +2,6 @@ from Modules.reloadable import ReloadableComponent
 from Modules.enableable import Enableable
 from discord.ext.commands import Cog, Bot
 
-import inspect
 
 class BaseMischief(Enableable, ReloadableComponent):
     mischief_name = None
