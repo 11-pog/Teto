@@ -74,8 +74,9 @@ class MischiefController(Cog):
             return await ctx.reply("nuh uh")
         
         for item in mischife:
-            item.is_enable = True
-            item.enable()
+            if item.is_enable == False:
+                item.is_enable = True
+                item.enable()
         
         await ctx.message.add_reaction("<:cat:1264072257433632789>")
     
@@ -88,8 +89,9 @@ class MischiefController(Cog):
             return await ctx.reply("nuh uh")
         
         for item in mischife:
-            item.is_enable = False
-            item.disable()
+            if item.is_enable == True:
+                item.is_enable = False
+                item.disable()
         
         await ctx.message.add_reaction("<:cat:1264072257433632789>")
     
