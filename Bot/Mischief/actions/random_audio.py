@@ -12,7 +12,6 @@ from discord.ext.commands import Bot, Context
 from discord.ext import commands
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.job import Job
 
 from Modules.settings import Settings
 from Modules.Logging.logger import logger
@@ -31,6 +30,7 @@ class RandomAudioMischief(CogMischief):
     
     mischief_name = "call_audio"
     mischief_description = "Thing that enters the call randomly and plays a random audio in resources/audio"
+    
     
     class AsyncTask:
         def __init__(self, parent, guild: discord.Guild):
@@ -60,11 +60,13 @@ class RandomAudioMischief(CogMischief):
             await self.parent.perform_a_minuscule_amount_of_despicable_actions(self.guild)
             self.job.resume()
     
+    
     def __init__(self, bot: Bot):
-        self.bot = bot
-        self.info_manager = InformationManager(self.bot)
+        super().__init__(bot)
         
-        self._loop = self.bot.loop
+        self.info_manager = InformationManager(self._bot)
+        
+        self._loop = self._bot.loop
         
         self.settings = Settings("mischief")
         self.settings.setup(
@@ -78,67 +80,65 @@ class RandomAudioMischief(CogMischief):
                         )
         
         
-        self.mischief_job_registry = []
-        self.scheduler = AsyncIOScheduler()
-        
-        self.is_enable = True
+        self._job_registry = []
+        self._scheduler = AsyncIOScheduler()
     
     
     def enable(self):
-        if self.is_enable == True:
-            return
-        
-        self.is_enable = True
-        for job in self.scheduler.get_jobs():
-            assert isinstance(job, Job)
+        for job in self._scheduler.get_jobs():
             job.resume()
     
     
     def disable(self):
-        if self.is_enable == False:
-            return
-        
-        self.is_enable = False
-        for job in self.scheduler.get_jobs():
-            assert isinstance(job, Job)
+        for job in self._scheduler.get_jobs():
             job.pause()
     
     
     async def reload(self):
         logger.info("Reloading Mischief")
-        await self.load()
+        
+        self.setup_audio_objects()
+        self.setup_chance_json()
+        
+        self._job_registry.clear()
+        self._scheduler.remove_all_jobs()
+        
         await self.set_jobs()
     
     
     async def initiate(self):
         logger.info('Mischief: Initialized the funny lmao xdxd')  
         await self.set_jobs()
-        self.scheduler.start()
+        self._scheduler.start()
     
     
     async def set_jobs(self):
         for guild in self.settings["guilds"]:
-            fetched_guild = await self.info_manager.fetch_guild_by_name(guild)
+            guild_obj = await self.info_manager.get_guild_by_name(guild)
             
-            if fetched_guild is not None:
-                job_schedule = self.AsyncTask(self, fetched_guild)
-                self.mischief_job_registry.append(job_schedule)
+            if guild_obj is not None:
+                job_schedule = self.AsyncTask(self, guild_obj)
+                self._job_registry.append(job_schedule)
     
     
     async def load(self):
-        self.mischief_job_registry.clear()
-        self.scheduler.remove_all_jobs()
-        
+        self.setup_audio_objects()
+        self.setup_chance_json()
+    
+    
+    def setup_audio_objects(self):
         self.interval: int = self.settings["interval_seconds"]
         
         self.regular_audios = os.listdir(REGULAR_AUDIO_PATH)
         self.rare_audios = [path for path in os.listdir(RARE_AUDIO_PATH) if not path.endswith(".json")]
-        
+    
+    
+    def setup_chance_json(self):
         if not os.path.exists(JSON_CHANCE_PATH):
             RandomAudioMischief.create_chance_json()
         
-        await self.load_json()
-        await self.fill_json_default_songs() 
+        self.load_json()
+        self.fill_json_default_songs() 
     
     
     @staticmethod
@@ -158,11 +158,11 @@ class RandomAudioMischief(CogMischief):
     
     async def QUIT_HAVING_FUN(self):
         """ends the fun D:"""
-        self.scheduler.remove_all_jobs()
+        self._scheduler.remove_all_jobs()
     
     
     def run_error(self, error: Exception):
-        self.bot.loop.create_task(self._on_error(error=error))
+        self._bot.loop.create_task(self._on_error(error=error))
     
     
     async def _on_error(self, error: Exception):
@@ -179,24 +179,24 @@ class RandomAudioMischief(CogMischief):
         return [voice_channel for voice_channel in guild.voice_channels if len(voice_channel.voice_states) > 0]
     
     
-    async def save_json(self):
+    def save_json(self):
         with open(JSON_CHANCE_PATH, 'w') as f:
             json.dump(self.chances, f, indent=4)
     
     
-    async def load_json(self):
+    def load_json(self):
         try:
             with open(JSON_CHANCE_PATH, 'r') as f:
                 self.chances: Dict[str, int] = json.load(f)
         except JSONDecodeError:
             logger.error("Json Rare Chances had problems decoding")
-            await self.save_json()
+            self.save_json()
         except FileNotFoundError:
-            logger.error("Json Rare Chances didnt exists")
-            await self.create_chance_json()
+            logger.warning("Json Rare Chances didnt exists")
+            self.create_chance_json()
     
     
-    async def fill_json_default_songs(self):
+    def fill_json_default_songs(self):
         song_chances: Dict[str, int] = self.chances["individual_audio_chance"]
         default_chance = self.chances["default_generated_chance"]
         
@@ -204,7 +204,7 @@ class RandomAudioMischief(CogMischief):
             song_chances.setdefault(filename, default_chance)
         
         self.chances["individual_audio_chance"] = song_chances
-        await self.save_json()
+        self.save_json()
     
     
     async def get_rare_audio(self):
@@ -270,7 +270,7 @@ class RandomAudioMischief(CogMischief):
     
     async def play_audio(self, audio_path, audio_name):
         guild = None
-        for vc in self.bot.voice_clients:
+        for vc in self._bot.voice_clients:
             if vc.is_connected():
                 guild = vc.guild
                 voice_client = vc
@@ -315,7 +315,7 @@ class RandomAudioMischief(CogMischief):
         channel = ctx.author.voice.channel
         guild = channel.guild
         
-        voice_client = discord.utils.get(self.bot.voice_clients, guild=guild)
+        voice_client = discord.utils.get(self._bot.voice_clients, guild=guild)
         if voice_client is None or not voice_client.is_connected():
             voice_client = await channel.connect()
         

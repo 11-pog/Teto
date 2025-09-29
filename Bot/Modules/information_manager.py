@@ -13,7 +13,7 @@ class InformationManager:
         self.bot = bot_object
     
     
-    async def fetch_guild_by_name(self, desired_server_name: str) -> discord.Guild | None:
+    async def get_guild_by_name(self, desired_server_name: str) -> discord.Guild | None:
         """Returns a server object by its name, returns None if no server is found
         
         Args:

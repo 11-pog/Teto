@@ -6,14 +6,14 @@ from discord.ext.commands import Cog, Bot
 class BaseMischief(Enableable, ReloadableComponent):
     mischief_name = None
     mischief_description = None
-    bot: Bot = None
+    _bot: Bot = None
     
     def __init__(self, bot):
-        self.bot = bot
+        self._bot = bot
     
     def _set_bot(self, bot):
-        if self.bot is None:
-            self.bot = bot
+        if self._bot is None:
+            self._bot = bot
 
 
 class TextMischief(BaseMischief):

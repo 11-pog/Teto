@@ -7,7 +7,7 @@ class BadWordResponse(TextMischief):
     mischief_description = "gets sad"
     
     async def check(self, normalized_text, message):
-        prefixes = tuple(await self.bot.get_prefix(message))
+        prefixes = tuple(await self._bot.get_prefix(message))
         
         if not normalized_text.startswith(prefixes):
             return False
