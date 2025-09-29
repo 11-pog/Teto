@@ -3,7 +3,7 @@ import yt_dlp
 
 
 ytdl_format_options = {
-    'format': 'bestaudio/best',
+    'format': 'bestaudio[ext=m4a]/bestaudio/best',
     'restrictfilenames': True,
     'noplaylist': True,
     'nocheckcertificate': True,
@@ -14,7 +14,7 @@ ytdl_format_options = {
     'default_search': 'auto',
     'source_address': '0.0.0.0',
     'fragment_retries': 5,
-    'extract_flat': True
+    'extract_flat': False
 }
 
 ytdl_extractor_options = {
@@ -25,7 +25,7 @@ ytdl_extractor_options = {
 
 ffmpeg_format_options = {
     'options': '-vn',
-    "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
+    'before_options': "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -nostdin",
 }
 
 yt_downloader = yt_dlp.YoutubeDL(ytdl_format_options)
