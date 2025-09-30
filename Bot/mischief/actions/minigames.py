@@ -5,7 +5,6 @@ class MINIGAMES(TextMischief):
     mischief_name = 'minigames'
     mischief_description = "reacts with pandemonium emote every time there is 'minigame' in a message"
     
-    
     def check(self, normalized_text, message):
         return 'minigames' in normalized_text
     
