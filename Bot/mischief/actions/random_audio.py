@@ -69,7 +69,7 @@ class RandomAudioMischief(CogMischief):
         
         self._loop = self._bot.loop
         
-        self.settings = Settings("mischief")
+        self.settings = Settings("random_audio")
         self.settings.setup(
                         guilds = [
                                 "Whatsapp 2",
