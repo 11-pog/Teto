@@ -40,6 +40,30 @@
 - **<prefix> diz a fila**: Mostra a fila de musica (numerada) até o numero cêm.
 - **<prefix> embaraia**: Embaralha a fila de músicas atual.
 
+--NEWMSG--
+
+## Comandos de Text To Speech (TTS)
+
+- **<prefix> lang [código]**  
+  Define a língua padrão do TTS para o usuário.  
+  Exemplos: `!!lang pt`, `!!lang en`, `!!lang ja`
+
+- **<prefix> ttsf**  
+  Ativa o modo de leitura automática.  
+  (Apenas um usuário por servidor pode manter o modo ativo ao mesmo tempo.)
+
+- **<prefix> ttsuf**  
+  Desativa o modo de leitura automática.
+
+- **<prefix> fala [texto]**  
+  O bot lerá o texto informado em voz alta.
+
+- **Troca temporária de idioma:**  
+  Se o texto contiver `--lang:xx`, o bot usará esse idioma apenas para essa fala.  
+  (Funciona tanto em `!!fala` quanto no modo automático.)  
+  Exemplo: `!!fala --lang:en Hello everyone!`
+
+
 --MODERATORCOMMANDS--
 
 # COMANDOS DE ADMIN (só aparece pra admin ou dono de servidor)

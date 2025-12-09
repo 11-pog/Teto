@@ -4,6 +4,7 @@ from Modules.settings.settings import Settings
 from mischief.interface import TextMischief
 
 from discord.ext.commands import Context, Bot
+from discord import Message
 
 
 class RandomReplyMischief(TextMischief):
@@ -35,7 +36,10 @@ class RandomReplyMischief(TextMischief):
             stop=self.settings['max_amount'] + 1
         )
     
-    async def check(self, normalized_text, message):
+    async def check(self, normalized_text, message: Message):
+        if message.author.id == self.bot.user.id:
+            return
+        
         if self.index <= 0:
             self.randomize_index()
             return True

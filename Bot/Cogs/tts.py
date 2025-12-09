@@ -156,8 +156,6 @@ class TextToSpeech(commands.Cog):
     
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        print("dhgsdklfhgsdfkjl")
-        
         guild = member.guild
         
         if guild.id not in self.flag_dict.keys():
