@@ -39,40 +39,10 @@ class VoiceChatCommands(commands.Cog):
         else:
             await ctx.reply("Eu nem to em call uai")
     
-    '''
+    
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        if member != self.bot.user:
-            return
-        
-        if before.channel and not after.channel:
-            self.ping_list.remove(before.channel.id)
-            logger.info(f'Bot has been disconnected from "{before.channel.name}", in "{before.channel.guild.name}"')
-        
-        elif not before.channel and after.channel:
-            await self.new_connection(after.channel.guild.voice_client, after.channel.id)
-            logger.info(f'Bot has joined the "{after.channel.name}" voice channel, in {after.channel.guild.name}')
-        
-        elif before.channel and after.channel and before.channel != after.channel:
-            self.ping_list.remove(before.channel.id)
-            await self.new_connection(after.channel.guild.voice_client, after.channel.id)
-            logger.info(f'Bot has moved from "{before.channel.name}" to "{after.channel.name}", in {after.channel.guild.name}')
-    
-    
-    async def new_connection(self, voice_client, channel_id):
-        self.ping_list.add(channel_id)
-        self.bot.loop.create_task(self.keep_connection_alive(voice_client))
-    
-    
-    async def keep_connection_alive(self, voice_client):
-        while voice_client.channel.id in self.ping_list:
-            try:
-                await voice_client.channel.guild.me.edit(nick="Tato")
-                logger.debug(f"Ping! in '{voice_client.channel.guild.name}'")
-            except discord.ClientException:
-                pass
-            await asyncio.sleep(15)
-'''
+        pass
 
 
 async def setup(bot: commands.Bot):

@@ -17,6 +17,13 @@ if lock is None:
 from discord import Intents
 from bot import BotClient
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from keep_alive import keep_alive
+
+keep_alive()
 
 #Bot Instantiation
 intents = Intents.default()
