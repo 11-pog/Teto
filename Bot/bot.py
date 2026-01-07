@@ -40,7 +40,7 @@ class BotClient(AutoShardedBot):
             'Cogs.text_channel_selection',
             'Cogs.mass_message_deletion',
             'Cogs.role_tag_controller',
-            'Cogs.tts',
+            'Cogs.tts.tts',
             'mischief.controller'
         )
         

@@ -32,7 +32,7 @@ intents.members = True
 
 has_terminal = Utils.has_terminal()
 bot = BotClient(
-    command_prefix=['aproveita e ', 'Aproveita e ', '!!'], 
+    command_prefix=['aproveita e ', 'Aproveita e ', 'APROVEITA E ', '!!', '<@&1426651445800865953> ', '<@1247668018708742164> '], 
     intents=intents,
     send_errors_to_developer_dm= not has_terminal,
     help_command= None, 

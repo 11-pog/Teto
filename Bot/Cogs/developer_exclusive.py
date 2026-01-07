@@ -22,6 +22,10 @@ class DevOnlyCommands(commands.Cog):
     async def get_emoji(self, ctx: Context, emoji: str):
         logger.info(f"Requested emogi: {emoji}", dev_fallback= DevFallback.YES_IF_NO_TERMINAL)
     
+    @commands.command(name = "cmd_print")
+    async def print_msg(self, ctx: Context, *, msg):
+        logger.info(f"message: {msg}")
+    
     #@commands.command(name = "idget")
     #async def get_user_id(self, ctx):
     #    print(ctx.author.id)
