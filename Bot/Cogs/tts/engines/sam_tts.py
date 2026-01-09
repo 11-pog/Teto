@@ -7,8 +7,10 @@ from Cogs.tts.abc import TTSEngineBase
 from Modules.Logging.logger import logger
 
 class SamTTSEngine(TTSEngineBase):
-    engine_name = "sam"
-    def_lang = 'sam'
+    engine_name = "samtts"
+    engine_description = "FV1 RFORM FUCKING UTLRKAIKILL LEJKST GOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+    
+    default_lang = 'sam'
     
     SAM_languages = {
         'elf': (72, 64, 160, 110),
@@ -18,7 +20,9 @@ class SamTTSEngine(TTSEngineBase):
         'alien': (100, 64, 200, 150),
         'sam': (72, 64, 128, 128),
     }
-    special_language_codes = ["custom [s] [p] [m] [t]"]
+    special_language_codes = { # TODO: Implement this
+        "custom": "[s] [p] [m] [t]"
+        }
     
     SAM_language_codes = {
         'elf': 'Elf',
@@ -27,7 +31,7 @@ class SamTTSEngine(TTSEngineBase):
         'old-lady': 'Little Old Lady',
         'alien': 'Extra-Terrestrial',
         'sam': 'SAM',
-        'custom [s] [p] [m] [t]': 'Custom Settings (speed, pitch, mouth and throat)'
+        'custom [speed] [pitch] [mouth] [throat]': 'Custom Settings [NOT IMPLEMENTED]'
     }
     
     @classmethod
@@ -74,7 +78,7 @@ class SamTTSEngine(TTSEngineBase):
                 "-ar 22050 "
                 "-ac 1"
             ),
-            options="-f s16le -ar 48000 -ac 2 -filter:a volume=0.3"
+            options="-f s16le -ar 48000 -ac 2 -filter:a volume=0.4"
         )
         
         return audio_source

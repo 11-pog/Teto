@@ -58,6 +58,9 @@ class Permission:
 
 # functions (that may be used)
 async def is_user_role_tagged(ctx: Context, *category):
+    if ctx.guild is None:
+        return False
+    
     blacklisted_roles = await Permission._fetch_roles_from_database(ctx, category)
     
     return any(user_role.id == blacklisted_role[0] for blacklisted_role in blacklisted_roles for user_role in ctx.author.roles)

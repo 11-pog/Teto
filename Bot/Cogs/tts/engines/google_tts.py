@@ -8,7 +8,9 @@ from gtts.lang import tts_langs
 
 class GoogleTTSEngine(TTSEngineBase):
     engine_name = "google"
-    def_lang = "es"
+    engine_description = "Google's text to speech Y'know"
+    
+    default_lang = "es"
     
     def __init__(self, text, lang):
         super().__init__(text, lang)

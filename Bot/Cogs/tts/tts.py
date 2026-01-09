@@ -27,9 +27,15 @@ class TextToSpeech(commands.Cog):
         )
         
         self.engines = { # TODO: make this auto/modular instead of fixed dict (detect from tts/engines)
-            'sam': SamTTSEngine,
+            'samtts': SamTTSEngine,
             'google': GoogleTTSEngine
         }
+        
+        self.engine_descriptions = { # TODO: Once again, make this auto
+            'samtts': SamTTSEngine.engine_description,
+            'google': GoogleTTSEngine.engine_description
+        }
+        
         
         self.flag_dict = {}
         self.tts_queue: List[TTSEngineBase] = {}
@@ -61,7 +67,15 @@ class TextToSpeech(commands.Cog):
     
     
     @commands.command(name="tts-engine")
-    async def change_tts_engine(self, ctx: Context, engine):
+    async def change_tts_engine(self, ctx: Context, engine = None):
+        if engine is None or engine.lower() == "help":
+            await self.try_send_dict(
+                ctx.author, 
+                self.engine_descriptions, 
+                "The available engines you can use as your tts (each has different lang settings):\n\n"
+            )
+            return
+        
         if engine not in self.engines.keys():
             await ctx.reply("fake engine")
             return
@@ -70,15 +84,19 @@ class TextToSpeech(commands.Cog):
         engine_class = self.get_engine(engine)
         
         self.user_settings.set_for_user(user_id, "engine", engine)
-        self.user_settings.set_for_user(user_id, "lang", engine_class.def_lang)
+        self.user_settings.set_for_user(user_id, "lang", engine_class.default_lang)
         
-        ctx.send(f"i am now {engine}")
+        await ctx.send(f"i am now {engine}")
     
-    async def try_send_dict(self, destination, dict: dict):
-        message = "Language name - Language Code (the one youll use in the command)\n\n"
+    
+    async def try_send_dict(self, destination, dict: dict, starting_message: str = "", invert: bool = False):
+        message = starting_message
         
         for key, value in dict.items():
-            message += f"{value} - {key}\n"
+            if invert:
+                message += f"{value} - {key}\n"
+                continue
+            message += f"{key} - {value}\n"
         
         await destination.send(message)
     
@@ -89,8 +107,19 @@ class TextToSpeech(commands.Cog):
         user_engine = self.user_settings.get_for_user(user.id, "engine")
         engine = self.get_engine(user_engine)
         
+        langs = engine.get_languages()
+        
+        if len(langs) == 0:
+            await ctx.send("This engine has no languages")
+            return
+        
         if lang is None or lang.lower() == "help":
-            await self.try_send_dict(user, engine.get_languages())
+            await self.try_send_dict(
+                user, 
+                langs, 
+                "Language name - Language Code (the one youll use in the command)\n\n",
+                invert=True,
+            )
             return
         
         if not engine.language_exists(lang):
@@ -105,6 +134,9 @@ class TextToSpeech(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         guild = message.guild
+        
+        if guild is None:
+            return
         
         if guild.id not in self.flag_dict.keys():
             return

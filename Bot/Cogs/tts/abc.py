@@ -1,13 +1,14 @@
 from abc import ABC, abstractmethod
 from io import BytesIO
-from typing import List
+from typing import Dict
 
 
 class TTSEngineBase(ABC):
     engine_name: str = ...
+    engine_description: str = "No description."
     
-    def_lang: str = ...
-    special_language_codes: List[str] = []
+    default_lang: str = ...
+    special_language_codes: Dict[str, str] = {}  # TODO: Implement this
     
     text: str = ...
     language: str = ...
@@ -22,7 +23,7 @@ class TTSEngineBase(ABC):
         self.text = text
     
     @abstractmethod
-    async def get_audio_source(self, text: str) -> BytesIO: ...
+    async def get_audio_source(self) -> BytesIO: ...
     
     @classmethod
     @abstractmethod
@@ -31,7 +32,7 @@ class TTSEngineBase(ABC):
     @classmethod
     def language_exists(cls, lang_code: str) -> bool:
         available = cls.get_languages()
-        return lang_code in available.keys()
+        return lang_code.lower().strip() in available.keys()
     
     def get_user_language(self, text, default):
         keyword_list = text.split(' ')
