@@ -45,8 +45,9 @@
 ## Comandos de Text To Speech (TTS)
 
 - **<prefix> lang [código]**  
-  Define a língua padrão do TTS para o usuário.  
-  Exemplos: `!!lang pt`, `!!lang en`, `!!lang ja`
+  Define a língua padrão do TTS para o usuário.
+  Use o comando sem parametro para lista de linguas disponiveis.
+  Exemplos: `!!lang pt`, `!!lang en`, `!!lang`
 
 - **<prefix> ttsf**  
   Ativa o modo de leitura automática.  
@@ -57,6 +58,11 @@
 
 - **<prefix> fala [texto]**  
   O bot lerá o texto informado em voz alta.
+
+- **<prefix> ttsengine [engine]**
+  Muda a engine de tts usada por você, cada engine tem sua propria lista de linguas
+  Use o comando sem parametro para lista de engines disponiveis.
+  Exemplos: `!!ttsengine google`, `!!ttsengine samtts`, `!!ttsengine`
 
 - **Troca temporária de idioma:**  
   Se o texto contiver `--lang:xx`, o bot usará esse idioma apenas para essa fala.  

@@ -60,7 +60,7 @@ class GeneralCommands(commands.Cog):
                 await ctx.author.send(message)
     
     
-    HELP_TEXT_PATH = os.path.join(resources_path.TEXTS, "Help_message.txt")
+    HELP_TEXT_PATH = os.path.join(resources_path.TEXTS, "Help_Message.txt")
     async def get_help_messages(self, ctx: Context, args) -> List[str]:
         help_text = await self.get_help_text(ctx, args)
         help_text = help_text.replace('<prefix> ', (await self.bot.get_prefix(ctx))[0])
